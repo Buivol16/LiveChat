@@ -8,6 +8,8 @@ import ua.denys.db.repositories.ClientRepository;
 import ua.denys.db.repositories.MessageRepository;
 import ua.denys.db.repositories.PrivateChatRepository;
 import ua.denys.exceptions.EntityNotFoundException;
+import ua.denys.mappers.ChatMapper;
+import ua.denys.mappers.ClientMapper;
 import ua.denys.mappers.MessageMapper;
 import ua.denys.model.MessageDTO;
 
@@ -19,23 +21,18 @@ public class MessageFacade {
   private final PrivateChatRepository privateChatRepository;
   private final ClientRepository clientRepository;
 
-  private static final MessageMapper mapper = MessageMapper.INSTANCE;
+  private static final MessageMapper messageMapper = MessageMapper.INSTANCE;
+  private static final ClientMapper clientMapper = ClientMapper.INSTANCE;
+  private static final ChatMapper chatMapper = ChatMapper.INSTANCE;
 
   @Transactional
   public MessageDTO registerMessage(MessageDTO messageDTO) throws EntityNotFoundException{
-    try {
-      var message = mapper.messageDTOToMessage(messageDTO, chatRepository, clientRepository);
+      var chatId = messageDTO.getChatId();
+      var chat = chatRepository.findById(chatId);
+      var privateChat = privateChatRepository.findById(chatId);
+      var author = clientMapper.clientDTOToClient(messageDTO.getAuthor());
+      var message = messageMapper.messageDTOToMessage(messageDTO, , author);
       message = messageRepository.save(message);
-      return mapper.messageToMessageDTO(message);
-    } catch (EntityNotFoundException e) {
-      try {
-        var message =
-            mapper.messageDTOToMessage(messageDTO, privateChatRepository, clientRepository);
-        message = messageRepository.save(message);
-        return mapper.messageToMessageDTO(message);
-      } catch (EntityNotFoundException e1) {
-        throw e1;
-      }
-    }
+      return messageMapper.messageToMessageDTO(message);
   }
 }

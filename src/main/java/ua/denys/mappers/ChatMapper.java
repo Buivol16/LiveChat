@@ -13,11 +13,11 @@ public interface ChatMapper {
 
   ChatMapper INSTANCE = Mappers.getMapper(ChatMapper.class);
 
-  @Mapping(
-      source = "messages",
-      target = "messageDTOs")
+  @Mapping(source = "messages", target = "messageDTOs")
   ChatDTO chatToChatDTO(Chat chat);
 
+  @Mapping(source = "messages", target = "messageDTOs" )
+  Chat chatDTOToChat(ChatDTO chatDTO);
 
   @Mapping(source = "messages", target = "messageDTOs")
   ChatDTO privateChatToChatDTO(PrivateChat privateChat);
