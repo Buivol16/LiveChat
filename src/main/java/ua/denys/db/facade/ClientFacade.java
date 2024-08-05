@@ -3,10 +3,10 @@ package ua.denys.db.facade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ua.denys.db.model.Client;
-import ua.denys.db.repositories.ClientRepository;
+import ua.denys.db.repository.ClientRepository;
 import ua.denys.exceptions.EmptyStringException;
 import ua.denys.exceptions.EntityNotFoundException;
-import ua.denys.mappers.ClientMapper;
+import ua.denys.mapper.ClientMapper;
 import ua.denys.model.ClientDTO;
 import ua.denys.service.IdCreator;
 
@@ -33,7 +33,7 @@ public class ClientFacade {
             () -> new EntityNotFoundException("Client with this special id is not found."));
   }
 
-  public ClientDTO createClient(String name) throws EmptyStringException{
+  public ClientDTO createClient(String name) throws EmptyStringException {
     if (name.isBlank()) throw new EmptyStringException("The name for client is blank.");
     var specialId = idCreator.createId();
     Client client;

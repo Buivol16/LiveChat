@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 @Entity
-@Table(name = "clients")
+@Table(name = "client")
 @Data
 @FieldDefaults(level = PRIVATE)
 @NoArgsConstructor

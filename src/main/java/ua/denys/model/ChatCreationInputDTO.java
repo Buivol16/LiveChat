@@ -15,5 +15,5 @@ import static lombok.AccessLevel.PRIVATE;
 @NoArgsConstructor
 public class ChatCreationInputDTO{
     String chatName;
-    ClientDTO clientDTO;
+    String clientSpecialId;
 }

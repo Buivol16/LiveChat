@@ -3,12 +3,13 @@ package ua.denys.db.facade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import ua.denys.db.repositories.ChatRepository;
-import ua.denys.db.repositories.ClientRepository;
-import ua.denys.db.repositories.MessageRepository;
-import ua.denys.db.repositories.PrivateChatRepository;
+import ua.denys.db.model.Chat;
+import ua.denys.db.model.Message;
+import ua.denys.db.repository.ChatRepository;
+import ua.denys.db.repository.ClientRepository;
+import ua.denys.db.repository.MessageRepository;
 import ua.denys.exceptions.EntityNotFoundException;
-import ua.denys.mappers.MessageMapper;
+import ua.denys.mapper.MessageMapper;
 import ua.denys.model.MessageDTO;
 
 @Component
@@ -16,26 +17,57 @@ import ua.denys.model.MessageDTO;
 public class MessageFacade {
   private final MessageRepository messageRepository;
   private final ChatRepository chatRepository;
-  private final PrivateChatRepository privateChatRepository;
   private final ClientRepository clientRepository;
 
   private static final MessageMapper mapper = MessageMapper.INSTANCE;
 
   @Transactional
-  public MessageDTO registerMessage(MessageDTO messageDTO) throws EntityNotFoundException{
-    try {
-      var message = mapper.messageDTOToMessage(messageDTO, chatRepository, clientRepository);
-      message = messageRepository.save(message);
-      return mapper.messageToMessageDTO(message);
-    } catch (EntityNotFoundException e) {
-      try {
-        var message =
-            mapper.messageDTOToMessage(messageDTO, privateChatRepository, clientRepository);
-        message = messageRepository.save(message);
-        return mapper.messageToMessageDTO(message);
-      } catch (EntityNotFoundException e1) {
-        throw e1;
-      }
+  public MessageDTO registerMessage(MessageDTO messageDTO, String chatId)
+      throws EntityNotFoundException {
+    var isPrivate = isPrivateChat(messageDTO);
+    var authorSpecialId = messageDTO.getAuthor().getSpecialId();
+    var messageText = messageDTO.getText();
+    var author =
+        clientRepository
+            .findBySpecialId(authorSpecialId)
+            .orElseThrow(() -> throwAuthorNotFoundException(authorSpecialId));
+
+    var chat = getPrivateOrPublicChat(messageDTO, isPrivate, authorSpecialId);
+
+    var message = Message.builder().author(author).chat(chat).text(messageText).build();
+    message = messageRepository.save(message);
+
+    return mapper.messageToMessageDTO(message);
+  }
+
+  private Chat getPrivateOrPublicChat(
+      MessageDTO messageDTO, boolean isPrivate, String authorSpecialId) {
+    Chat chat;
+    if (isPrivate) {
+      chat =
+          chatRepository
+              .findByRecipientSpecialId(messageDTO.getChatId())
+              .orElseThrow(() -> new EntityNotFoundException(authorSpecialId));
+    } else {
+      var chatIdLong = Long.parseLong(messageDTO.getChatId());
+      chat =
+          chatRepository
+              .findById(chatIdLong)
+              .orElseThrow(() -> throwChatNotFoundException(chatIdLong));
     }
+    return chat;
+  }
+
+  private static EntityNotFoundException throwAuthorNotFoundException(String authorSpecialId) {
+    return new EntityNotFoundException(
+        String.format("The user with special id %s is not found", authorSpecialId));
+  }
+
+  private static EntityNotFoundException throwChatNotFoundException(Long id) {
+    return new EntityNotFoundException(String.format("The chat with id %s is not found", id));
+  }
+
+  private static boolean isPrivateChat(MessageDTO messageDTO) {
+    return messageDTO.getChatId().startsWith("#");
   }
 }

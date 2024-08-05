@@ -1,4 +1,4 @@
-package ua.denys.mappers;
+package ua.denys.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -8,7 +8,7 @@ import ua.denys.model.ClientDTO;
 @Mapper
 public interface ClientMapper {
 
-    ClientMapper INSTANCE = Mappers.getMapper(ClientMapper.class);
+  ClientMapper INSTANCE = Mappers.getMapper(ClientMapper.class);
 
-    ClientDTO clientToClientDTO(Client client);
+  ClientDTO clientToClientDTO(Client client);
 }

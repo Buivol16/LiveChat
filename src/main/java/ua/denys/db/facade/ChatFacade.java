@@ -5,85 +5,63 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ua.denys.db.model.Chat;
-import ua.denys.db.model.PrivateChat;
-import ua.denys.db.repositories.ChatRepository;
-import ua.denys.db.repositories.PrivateChatRepository;
+import ua.denys.db.repository.ChatRepository;
 import ua.denys.exceptions.ChatAlreadyCreatedException;
 import ua.denys.exceptions.ChatNotFoundException;
 import ua.denys.exceptions.EmptyStringException;
-import ua.denys.exceptions.EntityNotFoundException;
 import ua.denys.exceptions.WrongNameFormatException;
-import ua.denys.mappers.ChatMapper;
-import ua.denys.mappers.PrivateChatMapper;
+import ua.denys.mapper.ChatMapper;
+import ua.denys.model.ChatCreationInputDTO;
 import ua.denys.model.ChatDTO;
-import ua.denys.model.ClientDTO;
-import ua.denys.model.PrivateChatDTO;
-import ua.denys.service.IdCreator;
 
 @Component
 @RequiredArgsConstructor
 public class ChatFacade {
   private final ChatRepository chatRepository;
-  private final PrivateChatRepository privateChatRepository;
   private final ClientFacade clientFacade;
-  private final IdCreator idCreator;
 
   private static final ChatMapper chatMapper = ChatMapper.INSTANCE;
-  private static final PrivateChatMapper privateChatMapper = PrivateChatMapper.INSTANCE;
 
-  public ChatDTO findById(String id) throws ChatNotFoundException {
-    var chat = chatRepository.findById(id);
-    var privateChat = privateChatRepository.findById(id);
-
-    if (chat.isPresent()) {
-      return chatMapper.chatToChatDTO(chat.get());
-    } else if (privateChat.isPresent()) {
-      return chatMapper.privateChatToChatDTO(privateChat.get());
-    } else throw new ChatNotFoundException("This chat is not exists.");
+  public ChatDTO findById(Long id) throws ChatNotFoundException {
+    var chat =
+        chatRepository
+            .findById(id)
+            .orElseThrow(() -> new ChatNotFoundException("This chat is not exists."));
+    return chatMapper.chatToChatDTO(chat);
   }
 
-  public ChatDTO createChat(String name, ClientDTO clientDTO)
+  public ChatDTO createChat(ChatCreationInputDTO inputDTO)
       throws EmptyStringException, WrongNameFormatException {
-    if (name.startsWith("#"))
-      throw new WrongNameFormatException("Chat's name mustn't starts with '#' tag.");
+    var name = inputDTO.getChatName();
+    var clientSpecialId = inputDTO.getClientSpecialId();
+    var client = clientFacade.findBySpecialId(clientSpecialId);
     checkStringForBlank(name);
-    if (checkClient(clientDTO)) {
-      if (chatRepository.existsByName(name)) throw new ChatAlreadyCreatedException("Chat with this name is already created.");
-      var id = idCreator.createId();
-      if (isExists(id)) return createChat(name, clientDTO);
-      var chat = Chat.builder().name(name).id(id).build();
-      chatRepository.save(chat);
-      return chatMapper.chatToChatDTO(chat);
-    } else
-      throw new EntityNotFoundException(
-          "This user is not available. So, you can't create a new chat.");
+    checkStringForBlank(clientSpecialId);
+    checkChatNameExistingOrElseThrowException(name);
+    if (inputDTO.getChatName().startsWith("#")) {
+      var recipient = clientFacade.findBySpecialId(inputDTO.getChatName());
+      var privateChat =
+          Chat.builder().isPrivate(true).name(name).author(client).recipient(recipient).build();
+      privateChat = chatRepository.save(privateChat);
+      return chatMapper.chatToChatDTO(privateChat);
+    } else {
+      var publicChat = Chat.builder().isPrivate(false).name(name).author(client).build();
+      publicChat = chatRepository.save(publicChat);
+      return chatMapper.chatToChatDTO(publicChat);
+    }
   }
 
-  public PrivateChatDTO createPrivateChat(String participantSpecialId, ClientDTO creatorDTO)
-      throws EntityNotFoundException, WrongNameFormatException, ChatAlreadyCreatedException {
-    if (!participantSpecialId.startsWith("#"))
-      throw new WrongNameFormatException("Private chat's name must starts with '#' tag.");
-    else participantSpecialId = participantSpecialId.replaceFirst("#", "");
-    var participant = clientFacade.findBySpecialId(participantSpecialId);
-    var creator = clientFacade.findBySpecialId(creatorDTO.getSpecialId());
-    if (creator.getName().equals(creatorDTO.getName())) {
-      if (privateChatRepository.findByCreatorAndParticipant(creator, participant).isPresent())
-        throw new ChatAlreadyCreatedException("Chat with this id is already created.");
-      var id = idCreator.createId();
-      if (isExists(id)) return createPrivateChat(participantSpecialId, creatorDTO);
-      var chat = PrivateChat.builder().creator(creator).participant(participant).id(id).build();
-      privateChatRepository.save(chat);
-      return privateChatMapper.privateChatToPrivateChatDTO(chat);
-    } else
-      throw new EntityNotFoundException(
-          "This user is not available. So, you can't create a new chat.");
+  private boolean checkChatNameExistingOrElseThrowException(String name) {
+    if (chatRepository.existsByName(name))
+      throw new ChatAlreadyCreatedException("Chat with this name is already created.");
+    return true;
   }
 
   public List<ChatDTO> getAvailableList() {
     return chatRepository.findAll().stream().map(chatMapper::chatToChatDTO).toList();
   }
 
-  public boolean isExists(String id) {
+  public boolean isExists(Long id) {
     try {
       return chatRepository.existsById(id);
     } catch (Exception e) {
@@ -91,21 +69,8 @@ public class ChatFacade {
     }
   }
 
-  private boolean checkClient(ClientDTO clientDTO) throws EntityNotFoundException {
-    var clientName = clientDTO.getName();
-    var clientSpecialId = clientDTO.getSpecialId();
-    if (clientFacade.findBySpecialId(clientSpecialId).getName().equals(clientName)) return true;
-    else return false;
-  }
-
   private void checkStringForBlank(String name) throws EmptyStringException {
     var exceptionMsg = "The chat name parameter is blank";
-    if (name == null) throw new EmptyStringException(exceptionMsg);
-    Optional.of(name)
-        .ifPresentOrElse(
-            chatName -> {
-              if (chatName.isBlank()) throw new EmptyStringException(exceptionMsg);
-            },
-            () -> new EmptyStringException(exceptionMsg));
+    if (name == null || name.isBlank()) throw new EmptyStringException(exceptionMsg);
   }
 }
