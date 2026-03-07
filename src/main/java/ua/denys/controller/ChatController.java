@@ -1,4 +1,4 @@
-package ua.denys.controller;
+package pl.denys.controller;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -11,13 +11,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import ua.denys.db.facade.ChatFacade;
-import ua.denys.db.facade.MessageFacade;
-import ua.denys.exceptions.EntityNotFoundException;
-import ua.denys.exceptions.WrongNameFormatException;
-import ua.denys.model.ChatCreationInputDTO;
-import ua.denys.model.ChatDTO;
-import ua.denys.model.MessageDTO;
+import pl.denys.db.facade.ChatFacade;
+import pl.denys.db.facade.MessageFacade;
+import pl.denys.exceptions.EntityNotFoundException;
+import pl.denys.exceptions.WrongNameFormatException;
+import pl.denys.model.ChatCreationInputDTO;
+import pl.denys.model.ChatDTO;
+import pl.denys.model.MessageDTO;
 
 @RestController
 @RequiredArgsConstructor

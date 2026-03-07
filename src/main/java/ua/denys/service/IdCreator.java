@@ -1,4 +1,4 @@
-package ua.denys.service;
+package pl.denys.service;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;

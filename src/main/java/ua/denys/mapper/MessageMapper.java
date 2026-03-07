@@ -1,13 +1,13 @@
-package ua.denys.mapper;
+package pl.denys.mapper;
 
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
-import ua.denys.db.model.Chat;
-import ua.denys.db.model.Message;
-import ua.denys.model.MessageDTO;
+import pl.denys.db.model.Chat;
+import pl.denys.db.model.Message;
+import pl.denys.model.MessageDTO;
 
 @Mapper(componentModel = "Spring")
 public interface MessageMapper {

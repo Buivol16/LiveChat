@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: chat-service
+  config:
+    import: configserver:http://localhost:8888
+  cloud:
+    stream:
+      kafka:
+        binder:
+          autoCreateTopics: false
+      bindings:
+        temperatures-out-0:
+          destination: temperatures
+    kafka:
+      binder:
+        brokers: "localhost:9092"

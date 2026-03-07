@@ -1,10 +1,10 @@
-package ua.denys.mapper;
+package pl.denys.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
-import ua.denys.db.model.Chat;
-import ua.denys.model.ChatDTO;
+import pl.denys.db.model.Chat;
+import pl.denys.model.ChatDTO;
 
 @Mapper(uses = {MessageMapper.class})
 public interface ChatMapper {

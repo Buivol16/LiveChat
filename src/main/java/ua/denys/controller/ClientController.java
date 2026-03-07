@@ -1,10 +1,10 @@
-package ua.denys.controller;
+package pl.denys.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ua.denys.db.facade.ClientFacade;
-import ua.denys.model.ClientDTO;
+import pl.denys.db.facade.ClientFacade;
+import pl.denys.model.ClientDTO;
 
 @RestController
 @RequiredArgsConstructor

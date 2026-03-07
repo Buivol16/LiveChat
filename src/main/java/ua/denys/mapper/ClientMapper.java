@@ -1,9 +1,9 @@
-package ua.denys.mapper;
+package pl.denys.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
-import ua.denys.db.model.Client;
-import ua.denys.model.ClientDTO;
+import pl.denys.db.model.Client;
+import pl.denys.model.ClientDTO;
 
 @Mapper
 public interface ClientMapper {

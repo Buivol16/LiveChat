@@ -1,16 +1,16 @@
-package ua.denys.db.facade;
+package pl.denys.db.facade;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import ua.denys.db.model.Chat;
-import ua.denys.db.model.Message;
-import ua.denys.db.repository.ChatRepository;
-import ua.denys.db.repository.ClientRepository;
-import ua.denys.db.repository.MessageRepository;
-import ua.denys.exceptions.EntityNotFoundException;
-import ua.denys.mapper.MessageMapper;
-import ua.denys.model.MessageDTO;
+import pl.denys.db.model.Chat;
+import pl.denys.db.model.Message;
+import pl.denys.db.repository.ChatRepository;
+import pl.denys.db.repository.ClientRepository;
+import pl.denys.db.repository.MessageRepository;
+import pl.denys.exceptions.EntityNotFoundException;
+import pl.denys.mapper.MessageMapper;
+import pl.denys.model.MessageDTO;
 
 @Component
 @RequiredArgsConstructor

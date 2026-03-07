@@ -1,14 +1,14 @@
-package ua.denys.db.facade;
+package pl.denys.db.facade;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import ua.denys.db.model.Client;
-import ua.denys.db.repository.ClientRepository;
-import ua.denys.exceptions.EmptyStringException;
-import ua.denys.exceptions.EntityNotFoundException;
-import ua.denys.mapper.ClientMapper;
-import ua.denys.model.ClientDTO;
-import ua.denys.service.IdCreator;
+import pl.denys.db.model.Client;
+import pl.denys.db.repository.ClientRepository;
+import pl.denys.exceptions.EmptyStringException;
+import pl.denys.exceptions.EntityNotFoundException;
+import pl.denys.mapper.ClientMapper;
+import pl.denys.model.ClientDTO;
+import pl.denys.service.IdCreator;
 
 @Component
 @RequiredArgsConstructor

@@ -1,7 +1,7 @@
-package ua.denys.db.repository;
+package pl.denys.db.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import ua.denys.db.model.Message;
+import pl.denys.db.model.Message;
 
 public interface MessageRepository extends JpaRepository<Message, Long> {
 

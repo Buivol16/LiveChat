@@ -1,4 +1,4 @@
-package ua.denys.db.model;
+package pl.denys.db.model;
 
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.Column;

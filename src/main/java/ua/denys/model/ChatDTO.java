@@ -1,4 +1,4 @@
-package ua.denys.model;
+package pl.denys.model;
 
 import lombok.Builder;
 import lombok.Data;

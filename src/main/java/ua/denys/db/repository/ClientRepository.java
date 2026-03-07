@@ -1,7 +1,7 @@
-package ua.denys.db.repository;
+package pl.denys.db.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import ua.denys.db.model.Client;
+import pl.denys.db.model.Client;
 
 import java.util.Optional;
 

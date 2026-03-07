@@ -1,18 +1,18 @@
-package ua.denys.db.facade;
+package pl.denys.db.facade;
 
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import ua.denys.db.model.Chat;
-import ua.denys.db.repository.ChatRepository;
-import ua.denys.exceptions.ChatAlreadyCreatedException;
-import ua.denys.exceptions.ChatNotFoundException;
-import ua.denys.exceptions.EmptyStringException;
-import ua.denys.exceptions.WrongNameFormatException;
-import ua.denys.mapper.ChatMapper;
-import ua.denys.model.ChatCreationInputDTO;
-import ua.denys.model.ChatDTO;
+import pl.denys.db.model.Chat;
+import pl.denys.db.repository.ChatRepository;
+import pl.denys.exceptions.ChatAlreadyCreatedException;
+import pl.denys.exceptions.ChatNotFoundException;
+import pl.denys.exceptions.EmptyStringException;
+import pl.denys.exceptions.WrongNameFormatException;
+import pl.denys.mapper.ChatMapper;
+import pl.denys.model.ChatCreationInputDTO;
+import pl.denys.model.ChatDTO;
 
 @Component
 @RequiredArgsConstructor

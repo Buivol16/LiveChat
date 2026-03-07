@@ -1,8 +1,8 @@
-package ua.denys.db.repository;
+package pl.denys.db.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import ua.denys.db.model.Chat;
+import pl.denys.db.model.Chat;
 
 import java.util.Optional;
 

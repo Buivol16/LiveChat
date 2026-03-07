@@ -1,4 +1,4 @@
-package ua.denys.exceptions;
+package pl.denys.exceptions;
 
 import org.springframework.web.bind.annotation.ResponseStatus;
 

@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: config-server
+  config:
+    name: configserver
+  cloud:
+    config:
+      server:
+        git:
+          defaultLabel: configs
+          uri: https://github.com/Buivol16/LiveChat
+          search-paths: configs
+server:
+  port: 8888
+
+eureka:
+  instance:
+    hostname: docker
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://discovery/eureka
