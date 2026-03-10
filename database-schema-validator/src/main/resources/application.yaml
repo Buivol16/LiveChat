@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: database-schema-validator
+  datasource:
+    url: "jdbc:postgresql://localhost:5432/livechat"
+    username: "admin"
+    password: "admin"
+  liquibase:
+    change-log: "classpath:/db/changelog/db.changelog-1.0.sql"

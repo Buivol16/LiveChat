@@ -7,7 +7,6 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.security.core.context.SecurityContextHolder;
 import pl.denys.configuration.context.CorrelationIdContextHolder;
 
 import java.io.IOException;
@@ -15,7 +14,7 @@ import java.util.UUID;
 
 public class CorrelationFilter implements Filter {
 
-    public static final String CORRELATION_ID_HEADER = "correlation-id";
+    public static final String CORRELATION_ID_HEADER = "X-Correlation-ID";
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {

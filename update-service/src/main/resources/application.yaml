@@ -1,15 +1,19 @@
 spring:
   application:
-    name: chat-service
+    name: update-service
   config:
-    import: configserver:http://localhost:8888
+    import: "configserver:http://localhost:8888/"
+  datasource:
+    url: "jdbc:postgresql://localhost:5432/livechat"
+    username: "admin"
+    password: "admin"
   cloud:
     stream:
       kafka:
         binder:
           autoCreateTopics: false
       bindings:
-        chat-created-out-0:
+        chat-created-in-0:
           destination: chat_create
     kafka:
       binder:

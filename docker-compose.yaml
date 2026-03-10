@@ -2,10 +2,14 @@ services:
 
   db:
     image: postgres
-    restart: always
+    restart: no
     shm_size: 128mb
     ports:
       - "5432:5432"
+    networks:
+      backend:
+        aliases:
+          - "postgres"
     environment:
       POSTGRES_DB: livechat
       POSTGRES_USER: admin
@@ -19,8 +23,17 @@ services:
     environment:
       - "KC_BOOTSTRAP_ADMIN_USERNAME=admin"
       - "KC_BOOTSTRAP_ADMIN_PASSWORD=admin"
+      - "KC_DB=postgres"
+      - "KC_DB_URL=jdbc:postgresql://postgres/livechat"
+      - "KC_DB_USERNAME=admin"
+      - "KC_DB_PASSWORD=admin"
+      - "KC_DB_SCHEMA=keycloak"
     command:
       - start-dev
+    networks:
+      backend:
+        aliases:
+          - "keycloak"
 
   config-service:
     image: config-server:0.0.1-SNAPSHOT
@@ -44,7 +57,7 @@ services:
         aliases:
           - "discovery"
     environment:
-      SPRING_CONFIG_IMPORT: "configserver:http://configserver:8888"
+      EUREKA_INSTANCE_PREFERIPADDRESS: "true"
 
   kafka:
     image: apache/kafka:latest
@@ -53,11 +66,9 @@ services:
     environment:
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
-
       KAFKA_LISTENERS: CONTROLLER://0.0.0.0:9091,HOST://0.0.0.0:9092,DOCKER://0.0.0.0:9093
       KAFKA_ADVERTISED_LISTENERS: HOST://localhost:9092,DOCKER://kafka:9093
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,HOST:PLAINTEXT,DOCKER:PLAINTEXT
-
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
       KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9091
       KAFKA_INTER_BROKER_LISTENER_NAME: DOCKER
