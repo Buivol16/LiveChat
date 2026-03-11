@@ -12,13 +12,15 @@ import pl.denys.update_service.repository.chat.ChatRepository;
 public class ChatService {
   private final ChatRepository chatRepository;
 
-  public void createChat(Chat chat) {
+  public Chat createChat(Chat chat) throws RuntimeException {
     try {
       log.info("Start creating chat with name {}", chat.getName());
-      chatRepository.save(chat);
+      var newChat = chatRepository.save(chat);
+      return newChat;
     } catch (RuntimeException e) {
       log.error("An exception happened while trying to create a new chat {}", e.getMessage());
       e.printStackTrace();
+      throw e;
     }
   }
 }

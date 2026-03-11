@@ -6,5 +6,5 @@ import pl.denys.dto.user.UserDTO;
 @Data
 public class ChatDTO {
     private String name;
-    private UserDTO creator;
+    private String creator;
 }

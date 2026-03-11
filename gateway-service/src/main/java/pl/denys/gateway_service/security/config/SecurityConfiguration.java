@@ -2,6 +2,7 @@ package pl.denys.gateway_service.security.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
@@ -15,7 +16,11 @@ public class SecurityConfiguration {
         .csrf(ServerHttpSecurity.CsrfSpec::disable)
         .authorizeExchange(
             authorize -> {
-              authorize.anyExchange().permitAll();
+                authorize.pathMatchers("/actuator/**").permitAll();
+              authorize.anyExchange().authenticated();
+            })
+            .oauth2ResourceServer(o2 -> {
+                o2.jwt(Customizer.withDefaults());
             })
         .addFilterBefore(new CorrelationFilter(), SecurityWebFiltersOrder.AUTHENTICATION);
     //        .oauth2ResourceServer(

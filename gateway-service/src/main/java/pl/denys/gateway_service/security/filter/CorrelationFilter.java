@@ -19,7 +19,8 @@ public class CorrelationFilter implements WebFilter {
         if (!headers.containsHeader(headerName) || !headers.get(headerName).getFirst().isBlank()){
             var id = UUID.randomUUID().toString();
             log.info("Client has no correlation header. Giving him a new one: {}", id);
-            req.getHeaders().set(headerName, id);
+            exchange.getRequest().getHeaders().set(headerName, id);
+            exchange.getResponse().getHeaders().set(headerName, id);
             CorrelationIdContextHolder.setCorrelationId(id);
         }
 

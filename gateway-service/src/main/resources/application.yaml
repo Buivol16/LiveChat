@@ -15,11 +15,12 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:6060
+          issuer-uri: http://localhost:6060/realms/livechat
   config:
     import: configserver:http://localhost:8888
   main:
     web-application-type: REACTIVE
+
 management:
   endpoint:
     gateway:
@@ -28,6 +29,7 @@ management:
     web:
       exposure:
         include: '*'
+
 eureka:
   instance:
     preferIpAddress: true

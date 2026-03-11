@@ -6,4 +6,4 @@ spring:
     username: "admin"
     password: "admin"
   liquibase:
-    change-log: "classpath:/db/changelog/db.changelog-1.0.sql"
+#    change-log: "classpath:/db/changelog/db.changelog-1.0.sql"

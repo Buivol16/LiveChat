@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import pl.denys.update_service.event.chat.ChatCreatedEvent;
-import pl.denys.update_service.model.chat.Chat;
 import pl.denys.update_service.service.ChatService;
 
 import java.util.function.Consumer;
@@ -21,7 +20,12 @@ public class ChatCreatedConsumer {
         return event -> {
             log.info("Received ChatCreatedEvent with correlationId {}", event.getCorrelationId());
             var chat = event.getChat();
-            chatService.createChat(chat);
+            try{
+                var created = chatService.createChat(chat);
+                log.info("Chat has been successfully created {} for correlationId {}", created.toString(), event.getCorrelationId());
+            }catch (RuntimeException e){
+                log.error("Error while creating new chat for correlation id {} {}", event.getCorrelationId(), e.getMessage());
+            }
         };
     }
 }

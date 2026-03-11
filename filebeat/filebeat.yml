@@ -1,0 +1,12 @@
+filebeat.inputs:
+  - type: filestream
+    take_over.enabled: true
+    enabled: true
+    id: java-app
+    paths:
+      - /var/log/*.log
+
+output.logstash:
+  hosts: ["http://elasticsearch"]
+  username: "elastic"
+  password: "admin"
