@@ -2,6 +2,7 @@ package pl.denys.update_service.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Service;
 import pl.denys.update_service.model.chat.Chat;
 import pl.denys.update_service.repository.chat.ChatRepository;

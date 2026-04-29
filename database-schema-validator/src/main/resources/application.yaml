@@ -2,7 +2,7 @@ spring:
   application:
     name: database-schema-validator
   datasource:
-    url: "jdbc:postgresql://localhost:5432/livechat"
+    url: "jdbc:postgresql://localhost:5433/livechat"
     username: "admin"
     password: "admin"
   liquibase:

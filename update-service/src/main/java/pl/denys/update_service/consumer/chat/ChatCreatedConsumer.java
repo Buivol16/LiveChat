@@ -2,6 +2,7 @@ package pl.denys.update_service.consumer.chat;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import pl.denys.update_service.event.chat.ChatCreatedEvent;
@@ -14,6 +15,7 @@ import java.util.function.Consumer;
 @RequiredArgsConstructor
 public class ChatCreatedConsumer {
     private final ChatService chatService;
+    private final StreamBridge streamBridge;
 
     @Bean(name = "chat-created")
     public Consumer<ChatCreatedEvent> chatCreated() {
@@ -21,8 +23,11 @@ public class ChatCreatedConsumer {
             log.info("Received ChatCreatedEvent with correlationId {}", event.getCorrelationId());
             var chat = event.getChat();
             try{
-                var created = chatService.createChat(chat);
-                log.info("Chat has been successfully created {} for correlationId {}", created.toString(), event.getCorrelationId());
+                var createdChat = chatService.createChat(chat);
+                event.setChat(createdChat);
+                log.info("Chat has been successfully createdChat {} for correlationId {}", createdChat.toString(), event.getCorrelationId());
+                streamBridge.send("created_chat_notification", event);
+                log.info("Notification has been sent");
             }catch (RuntimeException e){
                 log.error("Error while creating new chat for correlation id {} {}", event.getCorrelationId(), e.getMessage());
             }

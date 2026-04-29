@@ -1,3 +1,16 @@
 spring:
   application:
     name: notification-service
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:6060/realms/livechat
+  cloud:
+    stream:
+      kafka:
+        binder:
+          autoCreateTopics: false
+      bindings:
+        created_chat_notification-in-0:
+          destination: created_chat_notification
