@@ -13,14 +13,34 @@ import java.util.function.Consumer;
 @Component
 @RequiredArgsConstructor
 public class NotificationConsumer {
-    private final SimpMessagingTemplate messagingTemplate;
+  private final SimpMessagingTemplate messagingTemplate;
 
-    @Bean("created_chat_notification")
-    public Consumer<ChatCreatedEvent> createdChatNotification() {
-        return event -> {
-            var chatName = event.getChat().getName();
-            var user = event.getChat().getCreator();
-            messagingTemplate.convertAndSendToUser(user, "/topic/notification", "Chat " + chatName + " has been created successfully");
-        };
+  @Bean("created_chat_notification")
+  public Consumer<ChatCreatedEvent> createdChatNotification() {
+    try {
+      return event -> {
+        if (event.getChat() != null) {
+          handleChatCreatedEvent(event);
+        } else if (event.getMessage() != null) {
+          handleMessageCreatedEvent(event);
+        }
+      };
+    } catch (Exception e) {
+      log.error("Error while creating chat notification {}", e.getMessage());
+      throw e;
     }
+  }
+
+  private void handleChatCreatedEvent(ChatCreatedEvent chatCreatedEvent) {
+    var chatName = chatCreatedEvent.getChat().getName();
+    var user = chatCreatedEvent.getChat().getCreator();
+    messagingTemplate.convertAndSendToUser(
+        user, "/topic/notification", "Chat " + chatName + " has been created successfully");
+  }
+
+  private void handleMessageCreatedEvent(ChatCreatedEvent messageCreatedEvent) {
+    var encryptedMessage = messageCreatedEvent.getMessage().getEncryptedMessage();
+    var user = messageCreatedEvent.getMessage().getAuthorId();
+    messagingTemplate.convertAndSendToUser(user, "/topic/notification", encryptedMessage);
+  }
 }

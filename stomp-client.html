@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>STOMP WebSocket Test</title>
+</head>
+<body>
+<h2>STOMP WebSocket Test</h2>
+
+<div>
+    <button onclick="connect()">Connect</button>
+    <button onclick="disconnect()">Disconnect</button>
+</div>
+
+<br>
+
+<div>
+    <input id="messageInput" type="text" value="Hello from HTML client" style="width: 300px;">
+    <button onclick="sendMessage()">Send to /app/test</button>
+</div>
+
+<br>
+
+<div>
+    <button onclick="sendRestNotification()">Send REST notification</button>
+</div>
+
+<br>
+
+<pre id="log" style="background: #111; color: #0f0; padding: 15px; height: 400px; overflow: auto;"></pre>
+
+<script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7/bundles/stomp.umd.min.js"></script>
+
+<script>
+    let stompClient = null;
+
+    function log(message) {
+        const logElement = document.getElementById("log");
+        logElement.textContent += message + "\n";
+        logElement.scrollTop = logElement.scrollHeight;
+    }
+
+    function connect() {
+        stompClient = new StompJs.Client({
+            brokerURL: "ws://localhost:8080/notification",
+
+            connectHeaders: {
+                Authorization: "Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJTTUpfWHQ4RElfUzY4Z1JTRkk2VzN3Q0tENEVZd096NlhRUkEyS2s1U1pnIn0.eyJleHAiOjE3NzkyNDgyMDYsImlhdCI6MTc3OTIxMjIwNiwianRpIjoib25ydHJvOjQ3MjE0NWFlLTE1MWQtNzA2OC0zZjkyLTI4MTc3YjYzMWJiYiIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6NjA2MC9yZWFsbXMvbGl2ZWNoYXQiLCJhdWQiOiJhY2NvdW50Iiwic3ViIjoiNTc0NWUzYjktZGFjZC00MWIzLTlkZGYtM2IxZjRmNTY2MTc4IiwidHlwIjoiQmVhcmVyIiwiYXpwIjoiZ2F0ZXdheS1zZXJ2aWNlIiwic2lkIjoiODc4NzM4ZDMtMGY2Ni1hZmZkLTMzMTUtNmQ2MDc4OTAyNTY5IiwiYWNyIjoiMSIsImFsbG93ZWQtb3JpZ2lucyI6WyJodHRwOi8vbG9jYWxob3N0OjgwODAiXSwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbIm9mZmxpbmVfYWNjZXNzIiwidW1hX2F1dGhvcml6YXRpb24iLCJkZWZhdWx0LXJvbGVzLWxpdmVjaGF0Il19LCJyZXNvdXJjZV9hY2Nlc3MiOnsiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJlbWFpbCBwcm9maWxlIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsIm5hbWUiOiJEZW55cyBLaG1hcmEiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJidWl2b2wxNiIsImdpdmVuX25hbWUiOiJEZW55cyIsImZhbWlseV9uYW1lIjoiS2htYXJhIiwiZW1haWwiOiJ4bWFyYWRlbmlzNTRAZ21haWwuY29tIn0.PZxN6b1fzRQCg_eyIOx-j8U010b01imoNCP650ISQZWfof9UjOIj43hbKazVkaST1fshzDCmUruBQK6sMx1I85H4ec1zxZgiiSkzVFnAEeOWBlKCJuRxy2g9Piqyy6fXO_SN3ASFbAPtMH9aZbU9jP1tzZOdEc5Mz3CatZeQLGA20vRkacDmlTjBF5rRaFC0MvN2rfIT99WhyPRj8npqD8NlPJjlF4QIwEb04Phle2vSwkZWt8S3UF2dzl8b8iYDRLVLGOzar743AZNRhcjZyZpfmZXRG00-ZI7ezsz7SE7hy2S_TtMdx0rN-7i_4RcZXYZFao13tuIOiwDpoNGNPw"
+            },
+
+            debug: function (message) {
+                console.log(message);
+                log("[DEBUG] " + message);
+            },
+
+            onConnect: function (frame) {
+                log("Connected to STOMP");
+                log("Frame: " + JSON.stringify(frame.headers));
+
+                stompClient.subscribe("/topic/notification", function (message) {
+                    log("Received from /topic/notification:");
+                    log(message.body);
+                });
+                stompClient.subscribe("/user/topic/notification", function (message) {
+                    log("Received from /user/topic/notification:");
+                    log(message.body);
+                });
+
+                log("Subscribed to:");
+                log("- /topic/notification");
+                log("- /user/topic/notification");
+            },
+
+            onStompError: function (frame) {
+                log("STOMP error:");
+                log("Message: " + frame.headers["message"]);
+                log("Body: " + frame.body);
+            },
+
+            onWebSocketError: function (error) {
+                log("WebSocket error:");
+                log(error);
+            },
+
+            onWebSocketClose: function () {
+                log("WebSocket connection closed");
+            }
+        });
+
+        stompClient.activate();
+    }
+
+    function disconnect() {
+        if (stompClient !== null) {
+            stompClient.deactivate();
+            log("Disconnected");
+        }
+    }
+
+    function sendMessage() {
+        if (!stompClient || !stompClient.connected) {
+            log("Client is not connected");
+            return;
+        }
+
+        const message = document.getElementById("messageInput").value;
+
+        stompClient.publish({
+            destination: "/app/test",
+            body: message
+        });
+
+        log("Sent to /app/test: " + message);
+    }
+
+    async function sendRestNotification() {
+        try {
+            const response = await fetch("http://localhost:8080/test", {
+                method: "GET",
+                headers: {
+                    "Authorization": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJTTUpfWHQ4RElfUzY4Z1JTRkk2VzN3Q0tENEVZd096NlhRUkEyS2s1U1pnIn0.eyJleHAiOjE3Nzc1MDU0MjYsImlhdCI6MTc3NzQ2OTQyNiwianRpIjoib25ydHJvOmIyODMyZWE4LWM1YmMtYzYyNC0wMzI2LTlkMDc3Y2NkNzEwNiIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6NjA2MC9yZWFsbXMvbGl2ZWNoYXQiLCJhdWQiOiJhY2NvdW50Iiwic3ViIjoiNTc0NWUzYjktZGFjZC00MWIzLTlkZGYtM2IxZjRmNTY2MTc4IiwidHlwIjoiQmVhcmVyIiwiYXpwIjoiZ2F0ZXdheS1zZXJ2aWNlIiwic2lkIjoiMzM2MWJiNWYtMzI1Ni1iNGMwLWMzZDYtZmQxNGI0NTE0ODkzIiwiYWNyIjoiMSIsImFsbG93ZWQtb3JpZ2lucyI6WyJodHRwOi8vbG9jYWxob3N0OjgwODAiXSwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbIm9mZmxpbmVfYWNjZXNzIiwidW1hX2F1dGhvcml6YXRpb24iLCJkZWZhdWx0LXJvbGVzLWxpdmVjaGF0Il19LCJyZXNvdXJjZV9hY2Nlc3MiOnsiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJlbWFpbCBwcm9maWxlIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsIm5hbWUiOiJEZW55cyBLaG1hcmEiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJidWl2b2wxNiIsImdpdmVuX25hbWUiOiJEZW55cyIsImZhbWlseV9uYW1lIjoiS2htYXJhIiwiZW1haWwiOiJ4bWFyYWRlbmlzNTRAZ21haWwuY29tIn0.QoF_ZntguOI84UQ6Qt_OnYoRfM6-L2zR9Ft3RaaGROxscsBzOpWbRulpks6uHWgAEsvWCSLyILpRX2Nja3GAwdh9GC8Ah4KHNpPSGjgurXiqaDza_GaVYfIeypdHKlKiiyJvsynwmT5FMr7tGHJgt4lxlMJ9Q6PJoABf69e93VJZI4w8PIUsgJ6I3Hy6Ir8K8Qd982GFztfAQ8LyCACqC4k-NrYQOSjgNemYtrw-XE1aGqKxUx9oc_pXmcQNFlefjFGzaSzq52H3J05rKoOxMfztt0tQokgmNAPJHm12E0u7hSXQefYASMK5pgEKTSHLBWWBcTKLKr3n7mSQ3tuikw"
+                }
+            });
+
+            log("REST notification status: " + response.status);
+        } catch (error) {
+            log("REST request failed: " + error);
+        }
+    }
+</script>
+</body>
+</html>

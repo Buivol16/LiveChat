@@ -8,12 +8,10 @@ import pl.denys.configuration.context.CorrelationIdContextHolder;
 import pl.denys.dto.chat.ChatDTO;
 import pl.denys.event.ChatCreatedEvent;
 import pl.denys.mapper.ChatMapper;
-import pl.denys.repository.chat.ChatRepository;
 
 @Service
 @RequiredArgsConstructor
 public class ChatService {
-//    private final ChatRepository repository;
     private final StreamBridge streamBridge;
 
     private final ChatMapper mapper = Mappers.getMapper(ChatMapper.class);
@@ -21,6 +19,5 @@ public class ChatService {
     public void createChat(ChatDTO chatDTO) {
         var chat = mapper.chatDTOToChat(chatDTO);
         streamBridge.send("chat-created-out-0", new ChatCreatedEvent(chat, CorrelationIdContextHolder.getCorrelationId()));
-//        repository.save(chat);
     }
 }

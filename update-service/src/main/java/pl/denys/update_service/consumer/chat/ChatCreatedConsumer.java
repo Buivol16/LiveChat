@@ -6,7 +6,7 @@ import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import pl.denys.update_service.event.chat.ChatCreatedEvent;
-import pl.denys.update_service.service.ChatService;
+import pl.denys.update_service.service.chat.ChatService;
 
 import java.util.function.Consumer;
 
