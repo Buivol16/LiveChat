@@ -6,7 +6,9 @@ import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import pl.denys.update_service.event.message.MessageCreatedEvent;
+import pl.denys.update_service.model.notification.NotificationType;
 import pl.denys.update_service.service.message.MessageService;
+import pl.denys.update_service.service.notification.NotificationService;
 
 import java.util.function.Consumer;
 
@@ -15,6 +17,7 @@ import java.util.function.Consumer;
 @RequiredArgsConstructor
 public class MessageCreatedConsumer {
   private final MessageService messageService;
+  private final NotificationService notificationService;
   private final StreamBridge streamBridge;
 
   @Bean(name = "message-created")
@@ -24,7 +27,9 @@ public class MessageCreatedConsumer {
       var message = event.getMessage();
       try {
         var createdMessage = messageService.createMessage(message);
+        var notification = notificationService.saveAsNotification(createdMessage.getId(), NotificationType.MESSAGE_CREATED);
         event.setMessage(createdMessage);
+        event.setNotificationUuid(notification.getUuid());
         log.info(
             "Message has been successfully created {} for correlationId {}",
             createdMessage.toString(),

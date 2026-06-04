@@ -39,8 +39,7 @@ public class NotificationConsumer {
   }
 
   private void handleMessageCreatedEvent(ChatCreatedEvent messageCreatedEvent) {
-    var encryptedMessage = messageCreatedEvent.getMessage().getEncryptedMessage();
     var user = messageCreatedEvent.getMessage().getAuthorId();
-    messagingTemplate.convertAndSendToUser(user, "/topic/notification", encryptedMessage);
+    messagingTemplate.convertAndSendToUser(user, "/topic/notification", messageCreatedEvent);
   }
 }

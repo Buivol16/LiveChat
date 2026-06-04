@@ -12,6 +12,7 @@ import pl.denys.notification_service.event.message.Message;
 public class ChatCreatedEvent implements Serializable {
     private Chat chat;
     private Message message;
+    private String notificationUuid;
     private String correlationId;
 }
 

@@ -15,6 +15,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @RequiredArgsConstructor
 public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer {
   private final AuthenticationChannelInterceptor authenticationChannelInterceptor;
+
   @Override
   public void registerStompEndpoints(StompEndpointRegistry registry) {
     registry.addEndpoint("/notification").setAllowedOrigins("*");

@@ -9,7 +9,7 @@ spring:
     password: "admin"
   cloud:
     function:
-      definition: chat-created;message-created
+      definition: chat-created;message-created;notification-accepted
     stream:
       kafka:
         binder:
@@ -19,6 +19,8 @@ spring:
           destination: chat_create
         message-created-in-0:
           destination: message_create
+        notification-accepted-in-0:
+          destination: notification_accepted
     kafka:
       binder:
         brokers: "localhost:9092"

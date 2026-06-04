@@ -14,3 +14,5 @@ spring:
       bindings:
         created_chat_notification-in-0:
           destination: created_chat_notification
+        notification_accepted-out-0:
+          destination: notification_accepted

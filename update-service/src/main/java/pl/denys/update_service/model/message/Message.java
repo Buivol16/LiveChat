@@ -28,7 +28,7 @@ public class Message {
     @Transient
     private Long chatId;
     @JoinColumn(name = "chat_id", nullable = false)
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private Chat chat;
     @Column(name = "author_id")
     private String authorId;

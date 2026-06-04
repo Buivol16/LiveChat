@@ -14,4 +14,5 @@ import java.io.Serializable;
 public class MessageCreatedEvent implements Serializable {
     private Message message;
     private String correlationId;
+    private String notificationUuid;
 }
