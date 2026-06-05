@@ -1,9 +1,8 @@
-package ua.denys.model;
+package pl.denys.model;
 
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
-import ua.denys.mappers.MessageMapper;
 
 import java.util.List;
 
@@ -16,4 +15,5 @@ public class ChatDTO {
     String id;
     String name;
     List<MessageDTO> messageDTOs;
+    boolean isPrivate;
 }

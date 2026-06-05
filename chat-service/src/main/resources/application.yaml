@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: chat-service
+  config:
+    import: configserver:http://localhost:8888
+  cloud:
+    stream:
+      kafka:
+        binder:
+          autoCreateTopics: false
+      bindings:
+        chat-created-out-0:
+          destination: chat_create
+    kafka:
+      binder:
+        brokers: "localhost:9092"
+
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    registerWithEureka: true
+    fetchRegistry: true

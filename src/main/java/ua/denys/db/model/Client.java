@@ -1,4 +1,4 @@
-package ua.denys.db.model;
+package pl.denys.db.model;
 
 import static lombok.AccessLevel.PRIVATE;
 
@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 @Entity
-@Table(name = "clients")
+@Table(name = "client")
 @Data
 @FieldDefaults(level = PRIVATE)
 @NoArgsConstructor

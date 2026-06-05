@@ -1,4 +1,4 @@
-package ua.denys.config;
+package pl.denys.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;

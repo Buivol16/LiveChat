@@ -1,4 +1,4 @@
-package ua.denys.model;
+package pl.denys.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,5 +15,5 @@ import static lombok.AccessLevel.PRIVATE;
 @NoArgsConstructor
 public class ChatCreationInputDTO{
     String chatName;
-    ClientDTO clientDTO;
+    String clientSpecialId;
 }

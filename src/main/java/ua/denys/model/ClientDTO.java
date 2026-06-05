@@ -1,4 +1,4 @@
-package ua.denys.model;
+package pl.denys.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

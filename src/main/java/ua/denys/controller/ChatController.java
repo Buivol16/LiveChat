@@ -1,4 +1,4 @@
-package ua.denys.controller;
+package pl.denys.controller;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -8,12 +8,16 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import ua.denys.db.facade.ChatFacade;
-import ua.denys.db.facade.MessageFacade;
-import ua.denys.model.ChatDTO;
-import ua.denys.model.MessageDTO;
+import pl.denys.db.facade.ChatFacade;
+import pl.denys.db.facade.MessageFacade;
+import pl.denys.exceptions.EntityNotFoundException;
+import pl.denys.exceptions.WrongNameFormatException;
+import pl.denys.model.ChatCreationInputDTO;
+import pl.denys.model.ChatDTO;
+import pl.denys.model.MessageDTO;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,19 +29,24 @@ public class ChatController {
 
   @MessageMapping("/chat/{chatId}")
   @SendTo("/messages/{chatId}")
-  public MessageDTO actionChat(
-      @RequestBody MessageDTO messageDTO, @DestinationVariable("chatId") String chatId)
-      throws Exception {
-    return messageFacade.registerMessage(messageDTO);
+  public MessageDTO sendMessage(
+      @RequestBody MessageDTO messageDTO, @DestinationVariable("chatId") String chatId) {
+    return messageFacade.registerMessage(messageDTO, chatId);
   }
 
-  @GetMapping("/get-list")
-  public List<ChatDTO> getList() {
+  @PostMapping("/create-chat")
+  public ChatDTO createChat(@RequestBody ChatCreationInputDTO inputDTO)
+      throws EntityNotFoundException, WrongNameFormatException {
+    return chatFacade.createChat(inputDTO);
+  }
+
+  @GetMapping("/chat-list")
+  public List<ChatDTO> getChatList() {
     return chatFacade.getAvailableList();
   }
 
-  @GetMapping("/get-chat/{id}")
-  public ChatDTO getChat(@PathVariable String id) {
+  @GetMapping("/chat/{id}")
+  public ChatDTO getChat(@PathVariable Long id) {
     return chatFacade.findById(id);
   }
 }
