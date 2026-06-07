@@ -9,6 +9,8 @@ import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.ToString;
 
+import java.sql.Timestamp;
+
 @Data
 @Entity
 @Table(name = "chats", schema = "public")
@@ -21,4 +23,6 @@ public class Chat {
     private String name;
     @Column(name = "creator_id", nullable = false)
     private String creator;
+    @Column(name = "created_at", nullable = false)
+    private Timestamp createdAt;
 }

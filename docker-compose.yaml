@@ -15,18 +15,10 @@ services:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-    entrypoint: >
-      bash -c "
-        apt-get update &&
-        apt-get install -y postgresql-17-cron &&
-        rm -rf /var/lib/apt/lists/* &&
-        exec docker-entrypoint.sh postgres
-          -c shared_preload_libraries=pg_cron
-          -c cron.database_name='livechat'
-      "
-    
-
+      - ./postgres_data:/var/lib/postgresql/data
+      - ./postgres-entrypoint.sh:/postgres-entrypoint.sh:ro
+    entrypoint: [ "bash", "/postgres-entrypoint.sh" ]
+    command: [ "postgres" ]
   keycloak:
     image: keycloak/keycloak:26.4
     restart: no
@@ -128,7 +120,7 @@ services:
     container_name: kibana
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-#      - ELASTICSEARCH_USERNAME=elastic
+      #      - ELASTICSEARCH_USERNAME=elastic
       - ELASTICSEARCH_PASSWORD=admin # Same as Elasticsearch
     ports:
       - "5601:5601"
@@ -155,7 +147,7 @@ services:
     image: docker.elastic.co/beats/filebeat:9.3.1
     container_name: filebeat
     user: root
-    command: ["filebeat", "-e", "--strict.perms=false"]
+    command: [ "filebeat", "-e", "--strict.perms=false" ]
     volumes:
       - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
     depends_on:
@@ -167,6 +159,7 @@ volumes:
   elasticsearch-data:
     driver: local
   postgres-data:
+    driver: local
 
 networks:
   backend:
