@@ -14,6 +14,7 @@ services:
       POSTGRES_DB: livechat
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
+      TZ: "UTC"
     volumes:
       - ./postgres_data:/var/lib/postgresql/data
       - ./postgres-entrypoint.sh:/postgres-entrypoint.sh:ro
@@ -83,6 +84,10 @@ services:
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: false
 
+    volumes:
+      - ./kafka-entrypoint.sh:/kafka-entrypoint.sh:ro
+    command: [ "bash", "/kafka-entrypoint.sh" ]
+
   kafka-ui:
     image: kafbat/kafka-ui:main
     ports:
@@ -93,6 +98,12 @@ services:
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9093
     depends_on:
       - kafka
+  redis:
+    image: redis:8.6.4-alpine3.23
+    ports:
+      - "6379:6379"
+    networks:
+      - backend
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:9.3.1
