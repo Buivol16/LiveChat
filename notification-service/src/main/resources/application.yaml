@@ -6,7 +6,13 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: http://localhost:6060/realms/livechat
+  data:
+    redis:
+      host: localhost
+      port: 6379
   cloud:
+    function:
+      definition: created_chat_notification;message_read_event
     stream:
       kafka:
         binder:
@@ -16,3 +22,5 @@ spring:
           destination: created_chat_notification
         notification_accepted-out-0:
           destination: notification_accepted
+        message_read_event-in-0:
+          destination: message_read

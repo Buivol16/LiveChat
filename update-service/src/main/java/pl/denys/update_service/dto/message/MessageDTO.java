@@ -1,4 +1,4 @@
-package pl.denys.dto.message;
+package pl.denys.update_service.dto.message;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,10 +16,9 @@ public class MessageDTO {
     private String receiverId;
     private String encryptedMessage;
     private Boolean isPrivateChat;
-    private Boolean isMyMessage;
-    private Boolean isRead;
     private Timestamp createdAt;
     private Timestamp modifiedAt;
     private Boolean deletedForAll;
     private Boolean deletedForAuthorOnly;
 }
+

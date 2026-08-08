@@ -2,12 +2,14 @@ package pl.denys.update_service.service.notification;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.denys.update_service.event.message.MessageCreatedEvent;
 import pl.denys.update_service.exceptions.BusinessLogicException;
+import pl.denys.update_service.mapper.message.MessageMapper;
 import pl.denys.update_service.model.notification.Notification;
 import pl.denys.update_service.model.notification.NotificationStatus;
 import pl.denys.update_service.model.notification.NotificationType;
@@ -27,9 +29,11 @@ import static pl.denys.update_service.model.notification.NotificationStatus.UNAC
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Transactional
 public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final MessageService messageService;
+    private final MessageMapper messageMapper = Mappers.getMapper(MessageMapper.class);
     private final StreamBridge streamBridge;
 
     @Value("${notification.checker.minutes:30}")
@@ -46,13 +50,12 @@ public class NotificationService {
         notificationRepository.saveAll(notifications);
     }
 
-    @Transactional
     public void acceptNotification(String notificationUuid) {
         try {
             log.info("Accepting notification {}", notificationUuid);
-            notificationRepository.updateStatusByUuid(notificationUuid,ACCEPTED);
-            log.info("Notification {} accepted", notificationUuid);
-        }catch (Throwable e) {
+            var rows = notificationRepository.updateStatusByUuid(notificationUuid, ACCEPTED);
+            log.info("Notification {} accepted. Updated {} rows", notificationUuid, rows);
+        } catch (Throwable e) {
             log.error("Error accepting notification {} {}", notificationUuid, e.getMessage());
             e.printStackTrace();
             throw e;
@@ -77,7 +80,7 @@ public class NotificationService {
         var messageId = notification.getEntityId();
         try {
             var createdMessage = messageService.findById(messageId).orElseThrow(() -> new BusinessLogicException("Message not found"));
-            var event = new MessageCreatedEvent(createdMessage, UUID.randomUUID().toString(), notification.getUuid());
+            var event = new MessageCreatedEvent(messageMapper.messageToMessageDTO(createdMessage), UUID.randomUUID().toString(), notification.getUuid());
             log.info("Message has been successfully created {} for correlationId {}", createdMessage.toString(), event.getCorrelationId());
             streamBridge.send("created_chat_notification", event);
             log.info("Created message notification has been sent");

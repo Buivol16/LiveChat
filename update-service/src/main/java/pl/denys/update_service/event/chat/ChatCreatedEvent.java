@@ -14,7 +14,7 @@ import java.io.Serializable;
 public class ChatCreatedEvent implements Serializable {
     private Chat publicChat;
     private PrivateChat privateChat;
-    private boolean isPublicChat;
+    private Boolean isPublicChat;
     private String correlationId;
 }
 

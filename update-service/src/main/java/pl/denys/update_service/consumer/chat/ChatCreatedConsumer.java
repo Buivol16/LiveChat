@@ -28,7 +28,7 @@ public class ChatCreatedConsumer {
             var publicChat = event.getPublicChat();
             var privateChat = event.getPrivateChat();
             try {
-                if (event.isPublicChat()){
+                if (event.getIsPublicChat()){
                     createPublicChat(publicChat, event);
                 }else {
                     createPrivateChat(privateChat, event);

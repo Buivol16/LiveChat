@@ -25,11 +25,10 @@ public class CorrelationFilter implements Filter {
 
         if (corId == null) {
             corId = UUID.randomUUID().toString();
+            res.setHeader(CORRELATION_ID_HEADER, corId);
         }
 
         CorrelationIdContextHolder.setCorrelationId(corId);
-
-        res.setHeader(CORRELATION_ID_HEADER, corId);
 
         chain.doFilter(request,response);
     }

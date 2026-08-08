@@ -11,6 +11,27 @@ spring:
             locator:
               enabled: true
               lower-case-service-id: true
+          globalcors:
+            add-to-simple-url-handler-mapping: true
+            cors-configurations:
+              '[/**]':
+                allowedOrigins:
+                  - "http://localhost:4200"
+
+                allowedMethods:
+                  - GET
+                  - POST
+                  - PUT
+                  - PATCH
+                  - DELETE
+                  - OPTIONS
+
+                allowedHeaders:
+                  - "*"
+                exposedHeaders:
+                  - "X-Correlation-Id"
+
+                allowCredentials: true
   security:
     oauth2:
       resourceserver:

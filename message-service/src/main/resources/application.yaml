@@ -11,9 +11,16 @@ spring:
       bindings:
         message-created-out-0:
           destination: message_create
+        message-read-out-0:
+          destination: message_read
     kafka:
       binder:
         brokers: "localhost:9092"
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:6060/realms/livechat
 
 server:
   port: 8083

@@ -12,6 +12,6 @@ import java.util.List;
 public interface NotificationRepository extends JpaRepository<Notification, String> {
     List<Notification> findByStatusAndRecentlySentAtBefore(NotificationStatus status, Timestamp time);
     @Modifying
-    @Query("UPDATE Notification n SET status = ?2 WHERE n.uuid = ?1")
-    void updateStatusByUuid(String uuid, NotificationStatus status);
+    @Query("UPDATE Notification n SET n.status = ?2 WHERE n.uuid = ?1")
+    int updateStatusByUuid(String uuid, NotificationStatus status);
 }

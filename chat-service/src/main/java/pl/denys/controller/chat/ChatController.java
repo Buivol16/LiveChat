@@ -3,6 +3,7 @@ package pl.denys.controller.chat;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,5 +24,17 @@ public class ChatController {
         log.info("Creating chat with correlation id: {}", CorrelationIdContextHolder.getCorrelationId());
         chatService.createChat(chatDTO);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/private")
+    public ResponseEntity getAllPrivateChats(){
+        log.info("Retrieving all private chats with correlation id: {}", CorrelationIdContextHolder.getCorrelationId());
+        return ResponseEntity.ok(chatService.getAllPrivateByCreatorIdOrPartnerId());
+    }
+
+    @GetMapping("/public")
+    public ResponseEntity getAllPublicChats(){
+        log.info("Retrieving all public chats with correlation id: {}", CorrelationIdContextHolder.getCorrelationId());
+        return ResponseEntity.ok(chatService.getAllPublicByCreatorId());
     }
 }

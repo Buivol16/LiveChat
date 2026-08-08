@@ -1,5 +1,6 @@
 package pl.denys.update_service.consumer.message;
 
+import pl.denys.update_service.dto.message.MessageDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.stream.function.StreamBridge;
@@ -24,9 +25,17 @@ public class MessageCreatedConsumer {
   public Consumer<MessageCreatedEvent> messageCreated() {
     return event -> {
       log.info("Received MessageCreatedEvent with correlationId {}", event.getCorrelationId());
-      var message = event.getMessage();
+      var dto = event.getMessage();
       try {
-        var createdMessage = messageService.createMessage(message);
+        MessageDTO createdMessage;
+        if (dto.getIsPrivateChat()){
+          log.info("Creating Message for private chat with correlationId {}", event.getCorrelationId());
+          createdMessage = messageService.createMessageForPrivateChat(dto);
+        }else {
+          //todo write up method for public chats
+          log.info("Creating Message for public chat with correlationId {}", event.getCorrelationId());
+          createdMessage = new MessageDTO();
+        }
         var notification = notificationService.saveAsNotification(createdMessage.getId(), NotificationType.MESSAGE_CREATED);
         event.setMessage(createdMessage);
         event.setNotificationUuid(notification.getUuid());
@@ -35,12 +44,13 @@ public class MessageCreatedConsumer {
             createdMessage.toString(),
             event.getCorrelationId());
         streamBridge.send("created_chat_notification", event);
-        log.info("Created message notification has been sent");
+        log.info("Created dto notification has been sent");
       } catch (RuntimeException e) {
         log.error(
-            "Error while creating new message for correlation id {} {}",
+            "Error while creating new dto for correlation id {} {}",
             event.getCorrelationId(),
             e.getMessage());
+        e.printStackTrace();
       }
     };
   }

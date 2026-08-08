@@ -15,6 +15,8 @@ public class PrivateChatService {
     public PrivateChat createPrivateChat(PrivateChat privateChat) throws RuntimeException {
         try {
             log.info("Start creating private chat by {} with {}", privateChat.getCreator(), privateChat.getPartnerId());
+            privateChat.setDeletedForCreator(false);
+            privateChat.setDeletedForPartner(false);
             var newChat = privateChatRepository.save(privateChat);
             return newChat;
         } catch (RuntimeException e) {

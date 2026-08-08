@@ -10,9 +10,12 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import pl.denys.update_service.model.chat.Chat;
+import pl.denys.update_service.model.chat.PrivateChat;
 
 import java.sql.Timestamp;
 
@@ -20,6 +23,8 @@ import java.sql.Timestamp;
 @Entity
 @Table(name = "messages", schema = "private")
 @ToString
+@AllArgsConstructor
+@NoArgsConstructor
 public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,9 +32,12 @@ public class Message {
     //TODO Replace transient field with created different dto class and map all fields from this class to an entity
     @Transient
     private Long chatId;
-    @JoinColumn(name = "chat_id", nullable = false)
+    @JoinColumn(name = "public_chat_id", nullable = false)
     @ManyToOne(fetch = FetchType.EAGER)
     private Chat chat;
+    @JoinColumn(name = "private_chat_id", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    private PrivateChat privateChat;
     @Column(name = "author_id")
     private String authorId;
     @Column(name = "receiver_id")
