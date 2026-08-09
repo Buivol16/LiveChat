@@ -52,4 +52,6 @@ public class Message {
     private boolean deletedForAll;
     @Column(name = "deleted_for_author_only")
     private boolean deletedForAuthorOnly;
+    @Column
+    private Boolean isRead = false;
 }

@@ -1,9 +1,9 @@
-package pl.denys.event.message;
+package pl.denys.update_service.event.message;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import pl.denys.dto.message.MessageReadEventDTO;
+import pl.denys.update_service.dto.message.MessageReadEventDTO;
 
 import java.io.Serializable;
 import java.util.List;

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pl.denys.configuration.context.CorrelationIdContextHolder;
 import pl.denys.dto.message.MessageDTO;
+import pl.denys.dto.message.MessageReadEventDTO;
 import pl.denys.service.chat.MessageService;
 
 import java.util.List;
@@ -39,7 +40,7 @@ public class MessageController {
     }
 
     @PatchMapping("/read")
-    public ResponseEntity readMessage(@RequestParam List<Long> messageId){
+    public ResponseEntity readMessage(@RequestBody List<MessageReadEventDTO> messageId){
         service.readMessage(messageId);
         return ResponseEntity.ok().build();
     }

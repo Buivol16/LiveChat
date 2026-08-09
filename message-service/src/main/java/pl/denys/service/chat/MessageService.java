@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.denys.configuration.context.CorrelationIdContextHolder;
 import pl.denys.dto.message.MessageDTO;
+import pl.denys.dto.message.MessageReadEventDTO;
 import pl.denys.event.message.MessageCreatedEvent;
 import pl.denys.event.message.MessageReadEvent;
 import pl.denys.mapper.MessageMapper;
@@ -43,12 +44,10 @@ public class MessageService {
         }
     }
 
-    public void readMessage(List<Long> messageIds) {
+    public void readMessage(List<MessageReadEventDTO> messageIds) {
         log.info("Reading message with size {} with correlation id: {}", messageIds.size(), CorrelationIdContextHolder.getCorrelationId());
-        repository.readMessages(messageIds);
-        var userIds = repository.getAllGivenUserIds(messageIds);
         streamBridge.send(
                 "message-read-out-0",
-                new MessageReadEvent(messageIds, userIds, CorrelationIdContextHolder.getCorrelationId()));
+                new MessageReadEvent(messageIds, CorrelationIdContextHolder.getCorrelationId()));
     }
 }

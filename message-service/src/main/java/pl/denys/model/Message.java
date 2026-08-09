@@ -41,5 +41,5 @@ public class Message {
     private Boolean isRead;
 
     @Transient
-    private String myId = SecurityContextHolder.getContext().getAuthentication().getName();
+    private String authenticationContextUuid = SecurityContextHolder.getContext().getAuthentication().getName();
 }

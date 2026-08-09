@@ -32,7 +32,7 @@ public interface MessageMapper {
 
     @Named("mapIsMyMessage")
     default Boolean mapIsMyMessage(Message message) {
-        return message.getMyId().equals(message.getAuthorId());
+        return message.getAuthenticationContextUuid().equals(message.getAuthorId());
     }
 
     @Named("mapIsPrivateIfPrivateOrPublic")

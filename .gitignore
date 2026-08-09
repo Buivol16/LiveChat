@@ -36,4 +36,4 @@ build/
 
 ### Mac OS ###
 .DS_Store
-/postgres_data/
+postgres_data/

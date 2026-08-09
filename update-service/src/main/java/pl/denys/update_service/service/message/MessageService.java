@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.denys.update_service.dto.message.MessageReadEventDTO;
 import pl.denys.update_service.mapper.message.MessageMapper;
 import pl.denys.update_service.model.chat.PrivateChat;
 import pl.denys.update_service.model.message.Message;
@@ -13,6 +14,7 @@ import pl.denys.update_service.repository.message.MessageRepository;
 
 import java.sql.Timestamp;
 import java.time.Clock;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -20,7 +22,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Transactional
 public class MessageService {
-    private final MessageRepository messageRepository;
+    private final MessageRepository repository;
 
     private final MessageMapper mapper = Mappers.getMapper(MessageMapper.class);
 
@@ -49,7 +51,7 @@ public class MessageService {
             var message = mapper.messageDTOToMessage(messageDTO);
             message.setPrivateChat(chat);
             log.info("Saving message by {} user", messageDTO.getAuthorId());
-            var saved = messageRepository.save(message);
+            var saved = repository.save(message);
             messageDTO.setId(saved.getId());
             log.info("Message created by {} user", messageDTO.getAuthorId());
             return messageDTO;
@@ -61,6 +63,11 @@ public class MessageService {
     }
 
     public Optional<Message> findById(Long messageId) {
-        return messageRepository.findById(messageId);
+        return repository.findById(messageId);
+    }
+
+    public void readMessages(List<MessageReadEventDTO> messageReadEventDTOS) {
+        var messageIds = messageReadEventDTOS.stream().map(MessageReadEventDTO::getMessageId).toList();
+        repository.readMessages(messageIds);
     }
 }

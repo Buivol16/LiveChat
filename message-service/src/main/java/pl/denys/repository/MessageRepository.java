@@ -9,12 +9,8 @@ import java.util.List;
 
 @Repository
 public interface MessageRepository extends JpaRepository<Message, Long> {
-    @Query("SELECT m FROM Message m WHERE m.privateChatId = ?1")
+    @Query("SELECT m FROM Message m WHERE m.privateChatId = ?1 ORDER BY m.id ASC")
     List<Message> getAllPrivateChatMessages(Long chatId);
-
-    @Modifying
-    @Query("UPDATE Message m set m.isRead = true WHERE m.id IN (?1)")
-    void readMessages(List<Long> messageId);
 
     @Query("""
     SELECT DISTINCT

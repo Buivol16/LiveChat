@@ -7,6 +7,7 @@ import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import pl.denys.update_service.event.message.MessageCreatedEvent;
+import pl.denys.update_service.event.message.MessageReadEvent;
 import pl.denys.update_service.model.notification.NotificationType;
 import pl.denys.update_service.service.message.MessageService;
 import pl.denys.update_service.service.notification.NotificationService;
@@ -17,7 +18,7 @@ import java.util.function.Consumer;
 @Component
 @RequiredArgsConstructor
 public class MessageCreatedConsumer {
-  private final MessageService messageService;
+  private final MessageService service;
   private final NotificationService notificationService;
   private final StreamBridge streamBridge;
 
@@ -30,7 +31,7 @@ public class MessageCreatedConsumer {
         MessageDTO createdMessage;
         if (dto.getIsPrivateChat()){
           log.info("Creating Message for private chat with correlationId {}", event.getCorrelationId());
-          createdMessage = messageService.createMessageForPrivateChat(dto);
+          createdMessage = service.createMessageForPrivateChat(dto);
         }else {
           //todo write up method for public chats
           log.info("Creating Message for public chat with correlationId {}", event.getCorrelationId());
@@ -52,6 +53,15 @@ public class MessageCreatedConsumer {
             e.getMessage());
         e.printStackTrace();
       }
+    };
+  }
+
+  @Bean("message-read")
+  public Consumer<MessageReadEvent> messageRead() {
+    return event -> {
+      log.info("Updating message read status in messages {} with correlationId {}", event.getMessageIds(), event.getCorrelationId());
+      service.readMessages(event.getMessageIds());
+      log.info("Message read status has been successfully updated in messages {} with correlationId {}", event.getMessageIds(), event.getCorrelationId());
     };
   }
 }

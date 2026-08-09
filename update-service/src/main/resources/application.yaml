@@ -9,7 +9,7 @@ spring:
     password: "admin"
   cloud:
     function:
-      definition: chat-created;message-created;notification-accepted
+      definition: chat-created;message-created;notification-accepted;message-read
     stream:
       kafka:
         binder:
@@ -19,6 +19,8 @@ spring:
           destination: chat_create
         message-created-in-0:
           destination: message_create
+        message-read-in-0:
+          destination: message_read
         notification-accepted-in-0:
           destination: notification_accepted
     kafka:

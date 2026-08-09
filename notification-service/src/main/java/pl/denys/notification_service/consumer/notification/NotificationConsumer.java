@@ -61,8 +61,10 @@ public class NotificationConsumer {
     }
 
     private void handleMessageReadEvent(MessageReadEvent messageReadEvent) {
-        var user = messageReadEvent.getReceiverUuid();
-        log.info("Sending message read event to specific user {} with correlation id {}", user, messageReadEvent.getCorrelationId());
-        user.forEach(uuid -> messagingTemplate.convertAndSendToUser(uuid, "/topic/message/read", messageReadEvent.getMessageIds()));
+        messageReadEvent.getMessageIds().forEach(val -> {
+            log.info("Sending message read event to specific user {} with correlation id {}", val.getAuthorId(), messageReadEvent.getCorrelationId());
+
+            messagingTemplate.convertAndSendToUser(val.getAuthorId(), "/topic/message/read", val);
+        });
     }
 }
