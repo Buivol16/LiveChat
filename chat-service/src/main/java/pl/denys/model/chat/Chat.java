@@ -25,4 +25,6 @@ public class Chat {
     private String creator;
     @Column(name = "created_at", nullable = false)
     private Timestamp createdAt;
+    @Column(name = "description", length = 500)
+    private String description;
 }
