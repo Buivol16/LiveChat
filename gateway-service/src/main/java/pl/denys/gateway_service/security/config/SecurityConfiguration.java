@@ -11,20 +11,21 @@ import pl.denys.gateway_service.security.filter.CorrelationFilter;
 
 @Configuration
 public class SecurityConfiguration {
-  @Bean
-  public SecurityWebFilterChain httpSecurity(ServerHttpSecurity httpSecurity) throws Exception {
-    httpSecurity
-        .csrf(ServerHttpSecurity.CsrfSpec::disable)
-        .authorizeExchange(
-            authorize -> {
-                authorize.pathMatchers(HttpMethod.OPTIONS, "/**").permitAll();
-                authorize.pathMatchers("/actuator/**").permitAll();
-              authorize.anyExchange().authenticated();
-            })
-            .oauth2ResourceServer(o2 -> {
-                o2.jwt(Customizer.withDefaults());
-            })
-        .addFilterBefore(new CorrelationFilter(), SecurityWebFiltersOrder.AUTHENTICATION);
-    return httpSecurity.build();
-  }
+    @Bean
+    public SecurityWebFilterChain httpSecurity(ServerHttpSecurity httpSecurity) throws Exception {
+        httpSecurity
+                .cors(Customizer.withDefaults())
+                .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                .authorizeExchange(
+                        authorize -> {
+                            authorize.pathMatchers(HttpMethod.OPTIONS, "/**").permitAll();
+                            authorize.pathMatchers("/actuator/**").permitAll();
+                            authorize.anyExchange().authenticated();
+                        })
+                .oauth2ResourceServer(o2 -> {
+                    o2.jwt(Customizer.withDefaults());
+                })
+                .addFilterBefore(new CorrelationFilter(), SecurityWebFiltersOrder.AUTHENTICATION);
+        return httpSecurity.build();
+    }
 }

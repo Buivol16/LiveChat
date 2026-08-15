@@ -33,6 +33,7 @@ services:
       - "KC_DB_USERNAME=admin"
       - "KC_DB_PASSWORD=admin"
       - "KC_DB_SCHEMA=keycloak"
+      - "KC_PROXY_HEADERS=xforwarded"
     command:
       - start-dev
     networks:
