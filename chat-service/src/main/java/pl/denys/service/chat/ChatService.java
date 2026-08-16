@@ -137,4 +137,18 @@ public class ChatService {
             throw new RuntimeException(String.format("Code %s isn't exists with correlationId %s", code, correlationId));
         }
     }
+
+    public List<Member> getMembersByChatId(Long chatId) {
+        return memberRepository.findAllByChatId(chatId);
+    }
+
+    public void removeMember(Long memId) {
+        var userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        var isCreator = this.chatRepository.existsByCreatorAndId(userId, memberRepository.findChatIdById(memId));
+        if (isCreator){
+            memberRepository.deleteById(memId);
+        }else {
+            throw new RuntimeException("User has no rights to remove user member with id " + memId);
+        }
+    }
 }
