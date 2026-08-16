@@ -17,4 +17,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     @Query("SELECT m.chat.id FROM Member m WHERE m.id = ?1")
     Long findChatIdById(Long memId);
+
+    @Query("SELECT m.user.id FROM Member m WHERE m.chat.id = ?1")
+    List<String> findAllUserIdsByChatId(Long chatId);
 }

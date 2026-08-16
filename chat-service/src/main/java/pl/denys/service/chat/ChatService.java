@@ -6,11 +6,13 @@ import org.mapstruct.factory.Mappers;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.denys.configuration.context.CorrelationIdContextHolder;
 import pl.denys.dto.chat.ChatDTO;
 import pl.denys.dto.chat.ChatPreviewDTO;
 import pl.denys.dto.chat.PrivateChatDTO;
 import pl.denys.event.ChatCreatedEvent;
+import pl.denys.event.UserJoinEvent;
 import pl.denys.mapper.ChatMapper;
 import pl.denys.model.UserEntity;
 import pl.denys.model.chat.Chat;
@@ -21,6 +23,7 @@ import pl.denys.repository.chat.ChatRepository;
 import pl.denys.repository.chat.PrivateChatRepository;
 import pl.denys.repository.invitelink.InviteLinkRepository;
 import pl.denys.repository.member.MemberRepository;
+import pl.denys.repository.userentity.UserEntityRepository;
 
 import java.sql.Timestamp;
 import java.time.Clock;
@@ -36,6 +39,7 @@ public class ChatService {
     private final PrivateChatRepository privateChatRepository;
     private final ChatRepository chatRepository;
     private final MemberRepository memberRepository;
+    private final UserEntityRepository userEntityRepository;
     private final InviteLinkRepository inviteLinkRepository;
 
     private final ChatMapper mapper = Mappers.getMapper(ChatMapper.class);
@@ -95,7 +99,10 @@ public class ChatService {
             if (memberRepository.existsByUserAndChat(user, chat)) {
                 throw new RuntimeException("User is member of this chat already with code " + code + " and correlationId " + correlationId);
             } else {
-                memberRepository.save(new Member(null, user, chat));
+                var userDestinations = memberRepository.findAllUserIdsByChatId(chat.getId());
+                user = userEntityRepository.findById(userId).get();
+                var member = memberRepository.save(new Member(null, user, chat));
+                 streamBridge.send("user-joins-out-0", new UserJoinEvent(CorrelationIdContextHolder.getCorrelationId(), member, userDestinations));
             }
         } else {
             throw new RuntimeException(String.format("Code %s isn't exists with correlationId %s", code, correlationId));
@@ -145,9 +152,9 @@ public class ChatService {
     public void removeMember(Long memId) {
         var userId = SecurityContextHolder.getContext().getAuthentication().getName();
         var isCreator = this.chatRepository.existsByCreatorAndId(userId, memberRepository.findChatIdById(memId));
-        if (isCreator){
+        if (isCreator) {
             memberRepository.deleteById(memId);
-        }else {
+        } else {
             throw new RuntimeException("User has no rights to remove user member with id " + memId);
         }
     }

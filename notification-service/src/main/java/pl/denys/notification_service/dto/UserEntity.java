@@ -1,25 +1,16 @@
-package pl.denys.model;
+package pl.denys.notification_service.dto;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
-@Entity
-@Table(name = "user_entity", schema = "keycloak")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserEntity implements Serializable {
-    @Id
     private String id;
-    @Column(name = "first_name")
     private String firstName;
-    @Column(name = "last_name")
     private String lastName;
 }
