@@ -14,12 +14,14 @@ import lombok.NoArgsConstructor;
 import pl.denys.model.UserEntity;
 import pl.denys.model.chat.Chat;
 
+import java.io.Serializable;
+
 @Entity
 @Table(name="members", schema = "public")
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class Member {
+public class Member implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

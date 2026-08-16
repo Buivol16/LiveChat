@@ -12,7 +12,7 @@ spring:
       port: 6379
   cloud:
     function:
-      definition: created_chat_notification;message_read_event
+      definition: created_chat_notification;message_read_event;user_join_event
     stream:
       kafka:
         binder:
@@ -24,3 +24,5 @@ spring:
           destination: notification_accepted
         message_read_event-in-0:
           destination: message_read
+        user_join_event-in-0:
+          destination: user_joins

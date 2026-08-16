@@ -7,7 +7,9 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import pl.denys.notification_service.event.chat.ChatCreatedEvent;
 import pl.denys.notification_service.event.message.MessageReadEvent;
+import pl.denys.notification_service.event.userjoin.UserJoinEvent;
 
+import java.util.Objects;
 import java.util.function.Consumer;
 
 @Slf4j
@@ -44,6 +46,18 @@ public class NotificationConsumer {
         }
     }
 
+    @Bean("user_join_event")
+    public Consumer<UserJoinEvent> userJoinEventConsumer() {
+        return event -> {
+            try {
+                handleUserJoinEvent(event);
+            } catch (Exception e) {
+                log.error("Error while sending user join event {}", e.getMessage());
+                e.printStackTrace();
+            }
+        };
+    }
+
     private void handleChatCreatedEvent(ChatCreatedEvent chatCreatedEvent) {
         var chatName = chatCreatedEvent.getChat().getName();
         var user = chatCreatedEvent.getChat().getCreator();
@@ -65,6 +79,16 @@ public class NotificationConsumer {
             log.info("Sending message read event to specific user {} with correlation id {}", val.getAuthorId(), messageReadEvent.getCorrelationId());
 
             messagingTemplate.convertAndSendToUser(val.getAuthorId(), "/topic/message/read", val);
+        });
+    }
+
+    private void handleUserJoinEvent(UserJoinEvent userJoinEvent) throws CloneNotSupportedException {
+        var copy = (UserJoinEvent) userJoinEvent.clone();
+        copy.setUserDestinations(null);
+        userJoinEvent.getUserDestinations().forEach(user -> {
+            log.info("Sending user join event to specific user {} with correlation id {}", user, userJoinEvent.getCorrelationId());
+
+            messagingTemplate.convertAndSendToUser(user, "/topic/user/joins", copy);
         });
     }
 }

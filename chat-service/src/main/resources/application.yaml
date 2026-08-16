@@ -11,6 +11,8 @@ spring:
       bindings:
         chat-created-out-0:
           destination: chat_create
+        user-joins-out-0:
+          destination: user_joins
     kafka:
       binder:
         brokers: "localhost:9092"
