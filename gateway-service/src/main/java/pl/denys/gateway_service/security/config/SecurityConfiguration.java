@@ -20,6 +20,8 @@ public class SecurityConfiguration {
                         authorize -> {
                             authorize.pathMatchers(HttpMethod.OPTIONS, "/**").permitAll();
                             authorize.pathMatchers("/actuator/**").permitAll();
+                            authorize.pathMatchers("/notification-service/notification",
+                                    "/notification-service/notification/**").permitAll();
                             authorize.anyExchange().authenticated();
                         })
                 .oauth2ResourceServer(o2 -> {
