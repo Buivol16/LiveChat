@@ -20,7 +20,8 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:6060/realms/livechat
+          issuer-uri: https://192.168.100.4:8443/realms/livechat
+          jwk-set-uri: http://localhost:6060/realms/livechat/protocol/openid-connect/certs
 eureka:
   instance:
     preferIpAddress: true

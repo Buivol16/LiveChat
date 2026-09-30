@@ -41,7 +41,7 @@ public class SecurityConfiguration {
   CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration config = new CorsConfiguration();
 
-    config.setAllowedOrigins(List.of("*"));
+    config.setAllowedOrigins(List.of("http://192.168.100.4:4200", "https://192.168.100.4:4200", "capacitor://localhost", "*"));
 
     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 

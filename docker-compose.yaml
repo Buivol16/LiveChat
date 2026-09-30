@@ -34,12 +34,31 @@ services:
       - "KC_DB_PASSWORD=admin"
       - "KC_DB_SCHEMA=keycloak"
       - "KC_PROXY_HEADERS=xforwarded"
+      - "KC_HOSTNAME=https://192.168.100.4:8443"
     command:
       - start-dev
     networks:
       backend:
         aliases:
           - "keycloak"
+
+  keycloak-https:
+    image: nginx:alpine
+
+    depends_on:
+      - keycloak
+
+    ports:
+      - "8443:8443"
+
+    volumes:
+      - ./nginx/keycloak.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./.cert/dev-cert.pem:/etc/nginx/certs/dev-cert.pem:ro
+      - ./.cert/dev-key.pem:/etc/nginx/certs/dev-key.pem:ro
+    networks:
+      backend:
+        aliases:
+          - "nginx"
 
   config-service:
     image: config-server:0.0.1-SNAPSHOT
