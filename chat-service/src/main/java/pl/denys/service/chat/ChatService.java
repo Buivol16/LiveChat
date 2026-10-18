@@ -24,6 +24,7 @@ import pl.denys.repository.chat.PrivateChatRepository;
 import pl.denys.repository.invitelink.InviteLinkRepository;
 import pl.denys.repository.member.MemberRepository;
 import pl.denys.repository.userentity.UserEntityRepository;
+import pl.denys.util.AuthenticationContextHolderHelper;
 
 import java.sql.Timestamp;
 import java.time.Clock;
@@ -47,7 +48,7 @@ public class ChatService {
     public void createChat(ChatDTO chatDTO) {
         Chat chat = null;
         PrivateChat privateChat = null;
-        var creatorId = SecurityContextHolder.getContext().getAuthentication().getName();
+        var creatorId = AuthenticationContextHolderHelper.getAuthentication().getName();
         var isPublic = chatDTO.getIsPublic();
         chatDTO.setCreator(creatorId);
         chatDTO.setName(chatDTO.getPartnerId());
@@ -73,14 +74,14 @@ public class ChatService {
     }
 
     public List<PrivateChatDTO> getAllPrivateByCreatorIdOrPartnerId() {
-        var userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        var userId = AuthenticationContextHolderHelper.getAuthentication().getName();
         var privateChats = privateChatRepository.findAllByCreatorIdOrPartnerId(new UserEntity(userId, null, null));
         privateChats.forEach(privateChat -> privateChat.setCustomerId(userId));
         return mapper.privateChatToPrivateChatDTOList(privateChats);
     }
 
     public List<Chat> getAllPublicByUserId() {
-        var userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        var userId = AuthenticationContextHolderHelper.getAuthentication().getName();
         var user = new UserEntity();
         user.setId(userId);
         var publicChats = memberRepository.findAllByUser(user);
@@ -89,7 +90,7 @@ public class ChatService {
 
     public void enterChat(String code) {
         var correlationId = CorrelationIdContextHolder.getCorrelationId();
-        var userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        var userId = AuthenticationContextHolderHelper.getAuthentication().getName();
         var user = new UserEntity();
         user.setId(userId);
         var inviteLink = inviteLinkRepository.findById(code);
@@ -111,7 +112,7 @@ public class ChatService {
 
     public String createInviteCodeOrReturnExisting(Long chatId) {
         var correlationId = CorrelationIdContextHolder.getCorrelationId();
-        var userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        var userId = AuthenticationContextHolderHelper.getAuthentication().getName();
         var uuid = UUID.randomUUID().toString();
         var isAuthorized = chatRepository.existsByCreatorAndId(userId, chatId);
         if (isAuthorized) {
@@ -150,7 +151,7 @@ public class ChatService {
     }
 
     public void removeMember(Long memId) {
-        var userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        var userId = AuthenticationContextHolderHelper.getAuthentication().getName();
         var isCreator = this.chatRepository.existsByCreatorAndId(userId, memberRepository.findChatIdById(memId));
         if (isCreator) {
             memberRepository.deleteById(memId);
