@@ -13,6 +13,8 @@ spring:
           destination: chat_create
         user-joins-out-0:
           destination: user_joins
+        avatar-upload-out-0:
+          destination: avatar_upload
     kafka:
       binder:
         brokers: "localhost:9092"
