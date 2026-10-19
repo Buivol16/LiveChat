@@ -36,5 +36,7 @@ public class PrivateChat {
     @Column(name = "deleted_for_partner", nullable = false)
     private Boolean deletedForPartner;
     @Transient
+    private String avatarImageFilename;
+    @Transient
     private String customerId;
 }

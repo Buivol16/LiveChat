@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import pl.denys.event.AvatarChatUploadEvent;
 import pl.denys.event.AvatarUploadEvent;
 import pl.denys.model.UserEntity;
+import pl.denys.model.chat.Chat;
 import pl.denys.repository.avatar.AvatarRepository;
 import pl.denys.service.chat.ChatService;
 import pl.denys.util.AuthenticationContextHolderHelper;
@@ -22,6 +23,8 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.sql.Timestamp;
+import java.time.Clock;
 import java.util.UUID;
 
 @Slf4j
@@ -33,13 +36,13 @@ public class AvatarService {
     private final ChatService chatService;
     private final AvatarRepository repository;
 
-    public ResponseEntity uploadAvatar(MultipartFile file) {
+    public ResponseEntity uploadUserAvatar(MultipartFile file) {
         log.info("Uploading avatar");
         var imageFileName = UUID.randomUUID() + ".jpg";
         var outputFile = new File(imageFileName);
         compressImageFile(file, outputFile);
         var userId = AuthenticationContextHolderHelper.getAuthentication().getName();
-        streamBridge.send("avatar-upload-out-0", new AvatarUploadEvent(userId, imageFileName));
+        streamBridge.send("avatar-upload-out-0", new AvatarUploadEvent(userId, imageFileName, Timestamp.from(Clock.systemUTC().instant())));
         return ResponseEntity.ok().build();
     }
 
@@ -49,20 +52,41 @@ public class AvatarService {
         var outputFile = new File(imageFileName);
         compressImageFile(file, outputFile);
         var userId = AuthenticationContextHolderHelper.getAuthentication().getName();
-        if (chatService.isUserIdAuthorizedToAssignChatAvatar(userId, chatId)){
-            streamBridge.send("avatar-upload-out-0", new AvatarChatUploadEvent(chatId, imageFileName));
+        if (chatService.isUserIdAuthorizedToAssignChatAvatar(userId, chatId)) {
+            streamBridge.send("avatar-upload-out-0", new AvatarChatUploadEvent(chatId, imageFileName, Timestamp.from(Clock.systemUTC().instant())));
             return ResponseEntity.ok().build();
-        }else {
+        } else {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User has no authority to upload avatar for this chat");
         }
     }
 
-    public ResponseEntity getAvatar() {
+    public ResponseEntity getUserAvatarImage() {
         var userId = AuthenticationContextHolderHelper.getAuthentication().getName();
         var user = new UserEntity(userId, null, null);
         log.info("Getting avatar by userId {}", userId);
         var avatar = repository.findByUser(user);
         log.info("Avatar has been found successfully for userId {}", avatar);
+        var imageFile = new File("./" + avatar.getFileName());
+
+        if (!imageFile.exists()) return ResponseEntity.notFound().build();
+
+        byte[] byteArray = new byte[(int) imageFile.length()];
+        try (var imageOutputStream = new FileImageOutputStream(imageFile)) {
+            imageOutputStream.read(byteArray);
+            return ResponseEntity.ok(byteArray);
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
+    public ResponseEntity getChatAvatarImage(Long chatId) {
+        var userId = AuthenticationContextHolderHelper.getAuthentication().getName();
+        var chat = new Chat();
+        chat.setId(chatId);
+        log.info("Getting chat avatar by userId {}", userId);
+        var avatar = repository.findByChat(chat);
+        log.info("Avatar has been found successfully {}", avatar);
         var imageFile = new File("./" + avatar.getFileName());
 
         if (!imageFile.exists()) return ResponseEntity.notFound().build();
@@ -110,4 +134,8 @@ public class AvatarService {
         outputImage.getGraphics().drawImage(resultingImage, 0, 0, null);
         return outputImage;
     }
+
+//    public String getPrivateChatAvatarImage(String userId, Long chatId) {
+//        repository.findImageFilenameByRequesterUserIdAndChatId(userId,chatId);
+//    }
 }

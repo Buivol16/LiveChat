@@ -13,6 +13,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import pl.denys.model.UserEntity;
+import pl.denys.model.chat.Chat;
 
 @Entity
 @Table(name = "avatars", schema = "public")
@@ -30,4 +31,7 @@ public class Avatar {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private UserEntity user;
+    @ManyToOne
+    @JoinColumn(name = "chat_id")
+    private Chat chat;
 }

@@ -17,6 +17,7 @@ import pl.denys.model.chat.Chat;
 import pl.denys.model.chat.PrivateChat;
 import pl.denys.model.invitelink.InviteLink;
 import pl.denys.model.member.Member;
+import pl.denys.repository.avatar.AvatarRepository;
 import pl.denys.repository.chat.ChatRepository;
 import pl.denys.repository.chat.PrivateChatRepository;
 import pl.denys.repository.invitelink.InviteLinkRepository;
@@ -40,6 +41,7 @@ public class ChatService {
     private final MemberRepository memberRepository;
     private final UserEntityRepository userEntityRepository;
     private final InviteLinkRepository inviteLinkRepository;
+    private final AvatarRepository avatarRepository;
 
     private final ChatMapper mapper = Mappers.getMapper(ChatMapper.class);
 
@@ -74,8 +76,21 @@ public class ChatService {
     public List<PrivateChatDTO> getAllPrivateByCreatorIdOrPartnerId() {
         var userId = AuthenticationContextHolderHelper.getAuthentication().getName();
         var privateChats = privateChatRepository.findAllByCreatorIdOrPartnerId(new UserEntity(userId, null, null));
+        var avatars = avatarRepository.findImageFilenameByRequesterUserIdAndChatId(userId, privateChats.stream().map(PrivateChat::getId).toList());
         privateChats.forEach(privateChat -> privateChat.setCustomerId(userId));
-        return mapper.privateChatToPrivateChatDTOList(privateChats);
+        var privateChatDTOS = mapper.privateChatToPrivateChatDTOList(privateChats);
+        if (!avatars.isEmpty()){
+            for (int i = 0; i < avatars.size(); i++) {
+                var avatar = avatars.get(i);
+                for (var privateChatDTO : privateChatDTOS) {
+                    if (privateChatDTO.getReceiverId().equals(avatar.getUser().getId())) {
+                        privateChatDTO.setImgSrc(avatar.getFileName());
+                        break;
+                    }
+                }
+            }
+        }
+        return privateChatDTOS;
     }
 
     public List<Chat> getAllPublicByUserId() {
@@ -101,7 +116,7 @@ public class ChatService {
                 var userDestinations = memberRepository.findAllUserIdsByChatId(chat.getId());
                 user = userEntityRepository.findById(userId).get();
                 var member = memberRepository.save(new Member(null, user, chat));
-                 streamBridge.send("user-joins-out-0", new UserJoinEvent(CorrelationIdContextHolder.getCorrelationId(), member, userDestinations));
+                streamBridge.send("user-joins-out-0", new UserJoinEvent(CorrelationIdContextHolder.getCorrelationId(), member, userDestinations));
             }
         } else {
             throw new RuntimeException(String.format("Code %s isn't exists with correlationId %s", code, correlationId));
@@ -159,6 +174,6 @@ public class ChatService {
     }
 
     public boolean isUserIdAuthorizedToAssignChatAvatar(String userId, Long chatId) {
-        return repository.isExistsByCreatorAndId(userId, chatId);
+        return repository.existsByCreatorAndId(userId, chatId);
     }
 }

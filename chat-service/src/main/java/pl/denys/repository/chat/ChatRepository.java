@@ -9,6 +9,4 @@ public interface ChatRepository extends JpaRepository<Chat, Long> {
     List<Chat> findAllByCreator(String creatorId);
 
     boolean existsByCreatorAndId(String creator, Long id);
-
-    boolean isExistsByCreatorAndId(String creator, Long id);
 }
