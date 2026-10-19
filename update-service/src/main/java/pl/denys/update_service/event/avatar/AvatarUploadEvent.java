@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -12,4 +13,5 @@ import java.io.Serializable;
 public class AvatarUploadEvent implements Serializable {
     private String userId;
     private String imageFileName;
+    private Timestamp uploadedAt;
 }

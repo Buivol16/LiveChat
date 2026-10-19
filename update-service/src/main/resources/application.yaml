@@ -19,6 +19,8 @@ spring:
           destination: chat_create
         avatar-upload-in-0:
           destination: avatar_upload
+        avatar-chat-upload-in-0:
+          destination: avatar_upload
         message-created-in-0:
           destination: message_create
         message-read-in-0:

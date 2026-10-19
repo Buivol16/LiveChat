@@ -19,18 +19,20 @@ public class AvatarUploadConsumer {
     @Bean(name = "avatar-upload")
     public Consumer<AvatarUploadEvent> avatarUpload(){
         return event -> {
-            log.info("Avatar Upload Event: {}", event);
+            if (event.getUserId() == null) return;
+            log.info("Avatar Upload Event for user: {}", event);
             avatarService.handleAvatarUpload(event);
-            log.info("Avatar Upload Complete");
+            log.info("Avatar Upload Event for user Complete");
         };
     }
 
     @Bean(name = "avatar-chat-upload")
     public Consumer<AvatarChatUploadEvent> avatarChatUpload(){
         return event -> {
-            log.info("Avatar Upload Event: {}", event);
+            if (event.getChatId() == null) return;
+            log.info("Avatar Upload Event for chat: {}", event);
             avatarService.handleAvatarChatUpload(event);
-            log.info("Avatar Upload Complete");
+            log.info("Avatar Upload for chat Complete");
         };
     }
 }

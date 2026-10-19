@@ -14,6 +14,8 @@ import lombok.NoArgsConstructor;
 import pl.denys.update_service.model.UserEntity;
 import pl.denys.update_service.model.chat.Chat;
 
+import java.sql.Timestamp;
+
 @Entity
 @Table(name = "avatars", schema = "public")
 @Data
@@ -32,4 +34,8 @@ public class Avatar {
     @ManyToOne
     @JoinColumn(name = "chat_id")
     private Chat chat;
+    @Column(name = "is_using")
+    private boolean isUsing;
+    @Column(name = "uploaded_at")
+    private Timestamp uploadedAt;
 }
