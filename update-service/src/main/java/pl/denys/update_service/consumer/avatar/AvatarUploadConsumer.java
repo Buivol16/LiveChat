@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
+import pl.denys.update_service.event.avatar.AvatarChatUploadEvent;
 import pl.denys.update_service.event.avatar.AvatarUploadEvent;
 import pl.denys.update_service.service.avatar.AvatarService;
 
@@ -20,6 +21,15 @@ public class AvatarUploadConsumer {
         return event -> {
             log.info("Avatar Upload Event: {}", event);
             avatarService.handleAvatarUpload(event);
+            log.info("Avatar Upload Complete");
+        };
+    }
+
+    @Bean(name = "avatar-chat-upload")
+    public Consumer<AvatarChatUploadEvent> avatarChatUpload(){
+        return event -> {
+            log.info("Avatar Upload Event: {}", event);
+            avatarService.handleAvatarChatUpload(event);
             log.info("Avatar Upload Complete");
         };
     }

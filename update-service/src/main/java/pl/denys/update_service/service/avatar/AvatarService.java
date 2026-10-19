@@ -3,6 +3,7 @@ package pl.denys.update_service.service.avatar;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import pl.denys.update_service.event.avatar.AvatarChatUploadEvent;
 import pl.denys.update_service.event.avatar.AvatarUploadEvent;
 import pl.denys.update_service.model.UserEntity;
 import pl.denys.update_service.model.avatar.Avatar;
@@ -20,6 +21,25 @@ public class AvatarService {
         log.debug("Setting userId");
         var user = new UserEntity();
         user.setId(event.getUserId());
+        avatar.setUser(user);
+        log.debug("Setting avatar image fileName");
+        avatar.setFileName(event.getImageFileName());
+        log.debug("Saving new avatar to database");
+        try{
+            save(avatar);
+            log.debug("Avatar saved");
+        }catch (Exception e){
+            log.error("Error while saving avatar: {}", e);
+            e.printStackTrace();
+        }
+    }
+
+    public void handleAvatarChatUpload(AvatarChatUploadEvent event){
+        log.info("Handling avatar chat upload via service layer: {}", event);
+        var avatar = new Avatar();
+        log.debug("Setting userId");
+        var user = new UserEntity();
+        user.setId(event);
         avatar.setUser(user);
         log.debug("Setting avatar image fileName");
         avatar.setFileName(event.getImageFileName());

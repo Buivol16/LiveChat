@@ -3,12 +3,15 @@ package pl.denys.service.avatar;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.stream.function.StreamBridge;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import pl.denys.event.AvatarChatUploadEvent;
 import pl.denys.event.AvatarUploadEvent;
 import pl.denys.model.UserEntity;
 import pl.denys.repository.avatar.AvatarRepository;
+import pl.denys.service.chat.ChatService;
 import pl.denys.util.AuthenticationContextHolderHelper;
 
 import javax.imageio.IIOImage;
@@ -27,6 +30,7 @@ import java.util.UUID;
 //todo think up how to reduce tension for this microservice because of this new feature
 public class AvatarService {
     private final StreamBridge streamBridge;
+    private final ChatService chatService;
     private final AvatarRepository repository;
 
     public ResponseEntity uploadAvatar(MultipartFile file) {
@@ -37,6 +41,20 @@ public class AvatarService {
         var userId = AuthenticationContextHolderHelper.getAuthentication().getName();
         streamBridge.send("avatar-upload-out-0", new AvatarUploadEvent(userId, imageFileName));
         return ResponseEntity.ok().build();
+    }
+
+    public ResponseEntity uploadAvatarToChat(MultipartFile file, Long chatId) {
+        log.info("Uploading avatar to assign to chat {}", chatId);
+        var imageFileName = UUID.randomUUID() + ".jpg";
+        var outputFile = new File(imageFileName);
+        compressImageFile(file, outputFile);
+        var userId = AuthenticationContextHolderHelper.getAuthentication().getName();
+        if (chatService.isUserIdAuthorizedToAssignChatAvatar(userId, chatId)){
+            streamBridge.send("avatar-upload-out-0", new AvatarChatUploadEvent(chatId, imageFileName));
+            return ResponseEntity.ok().build();
+        }else {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User has no authority to upload avatar for this chat");
+        }
     }
 
     public ResponseEntity getAvatar() {

@@ -4,9 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
 import org.springframework.cloud.stream.function.StreamBridge;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import pl.denys.configuration.context.CorrelationIdContextHolder;
 import pl.denys.dto.chat.ChatDTO;
 import pl.denys.dto.chat.ChatPreviewDTO;
@@ -38,7 +36,7 @@ import java.util.UUID;
 public class ChatService {
     private final StreamBridge streamBridge;
     private final PrivateChatRepository privateChatRepository;
-    private final ChatRepository chatRepository;
+    private final ChatRepository repository;
     private final MemberRepository memberRepository;
     private final UserEntityRepository userEntityRepository;
     private final InviteLinkRepository inviteLinkRepository;
@@ -114,7 +112,7 @@ public class ChatService {
         var correlationId = CorrelationIdContextHolder.getCorrelationId();
         var userId = AuthenticationContextHolderHelper.getAuthentication().getName();
         var uuid = UUID.randomUUID().toString();
-        var isAuthorized = chatRepository.existsByCreatorAndId(userId, chatId);
+        var isAuthorized = repository.existsByCreatorAndId(userId, chatId);
         if (isAuthorized) {
 
 
@@ -152,11 +150,15 @@ public class ChatService {
 
     public void removeMember(Long memId) {
         var userId = AuthenticationContextHolderHelper.getAuthentication().getName();
-        var isCreator = this.chatRepository.existsByCreatorAndId(userId, memberRepository.findChatIdById(memId));
+        var isCreator = this.repository.existsByCreatorAndId(userId, memberRepository.findChatIdById(memId));
         if (isCreator) {
             memberRepository.deleteById(memId);
         } else {
             throw new RuntimeException("User has no rights to remove user member with id " + memId);
         }
+    }
+
+    public boolean isUserIdAuthorizedToAssignChatAvatar(String userId, Long chatId) {
+        return repository.isExistsByCreatorAndId(userId, chatId);
     }
 }

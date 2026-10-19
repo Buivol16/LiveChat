@@ -9,7 +9,7 @@ spring:
     password: "admin"
   cloud:
     function:
-      definition: chat-created;message-created;notification-accepted;message-read;avatar-upload
+      definition: chat-created;message-created;notification-accepted;message-read;avatar-upload;avatar-chat-upload
     stream:
       kafka:
         binder:

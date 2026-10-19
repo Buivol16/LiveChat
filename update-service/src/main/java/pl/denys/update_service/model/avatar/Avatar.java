@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import pl.denys.update_service.model.UserEntity;
+import pl.denys.update_service.model.chat.Chat;
 
 @Entity
 @Table(name = "avatars", schema = "public")
@@ -28,4 +29,7 @@ public class Avatar {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private UserEntity user;
+    @ManyToOne
+    @JoinColumn(name = "chat_id")
+    private Chat chat;
 }
