@@ -30,7 +30,7 @@ public class AvatarService {
         avatar.setUsing(true);
         log.debug("Saving new avatar to database");
         try{
-            saveAndSetUnusedStatusForAvatarsByUserId(avatar);
+            setUnusedStatusForAvatarsByUserIdAndSave(avatar);
             log.debug("Avatar saved");
         }catch (Exception e){
             log.error("Error while saving avatar: {}", e);
@@ -49,9 +49,10 @@ public class AvatarService {
         log.debug("Setting avatar image fileName");
         avatar.setFileName(event.getImageFileName());
         avatar.setUsing(true);
+        avatar.setUploadedAt(event.getUploadedAt());
         log.debug("Saving new avatar to database");
         try{
-            saveAndSetUnusedStatusForAvatarsByChatId(avatar);
+            setUnusedStatusForAvatarsByChatIdAndSave(avatar);
             log.debug("Avatar saved");
         }catch (Exception e){
             log.error("Error while saving avatar: {}", e);
@@ -59,12 +60,12 @@ public class AvatarService {
         }
     }
 
-    public void saveAndSetUnusedStatusForAvatarsByUserId(Avatar avatar){
+    public void setUnusedStatusForAvatarsByUserIdAndSave(Avatar avatar){
         avatarRepository.setUnusedStatusForAvatarsByUserId(avatar.getUser().getId());
         avatarRepository.save(avatar);
     }
 
-    public void saveAndSetUnusedStatusForAvatarsByChatId(Avatar avatar){
+    public void setUnusedStatusForAvatarsByChatIdAndSave(Avatar avatar){
         avatarRepository.setUnusedStatusForAvatarsByChatId(avatar.getChat().getId());
         avatarRepository.save(avatar);
     }

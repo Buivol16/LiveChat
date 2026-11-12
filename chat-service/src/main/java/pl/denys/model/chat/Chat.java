@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.Data;
 import lombok.ToString;
 
@@ -27,4 +28,6 @@ public class Chat {
     private Timestamp createdAt;
     @Column(name = "description", length = 500)
     private String description;
+    @Transient
+    private String imageFilename;
 }

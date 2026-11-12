@@ -29,13 +29,18 @@ public class AvatarController {
         return avatarService.getUserAvatarImage();
     }
 
+    @GetMapping(value = "/file/{filename}", produces = {MediaType.IMAGE_JPEG_VALUE})
+    public ResponseEntity getUserAvatarImageByFilename(@PathVariable String filename){
+        return avatarService.getAvatarImageByFilename(filename);
+    }
+
     @GetMapping(value = "/{chatId}", produces = {MediaType.IMAGE_JPEG_VALUE})
-    public ResponseEntity getChatAvatarImage(@PathVariable Long chatId){
+    public ResponseEntity getPublicChatAvatarImage(@PathVariable Long chatId){
         return avatarService.getChatAvatarImage(chatId);
     }
 
     @PostMapping("/upload/{chatId}")
-    public ResponseEntity uploadAvatarToChat(@RequestBody MultipartFile file, @PathVariable Long chatId){
+    public ResponseEntity uploadAvatarToPublicChat(@RequestBody MultipartFile file, @PathVariable Long chatId){
         return avatarService.uploadAvatarToChat(file, chatId);
     }
 }

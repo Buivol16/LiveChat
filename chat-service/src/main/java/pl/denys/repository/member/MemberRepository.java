@@ -9,6 +9,7 @@ import pl.denys.model.member.Member;
 import java.util.List;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
+    @Query("SELECT m FROM Member m WHERE m.user = ?1 ORDER BY m.chat.id ASC")
     List<Member> findAllByUser(UserEntity user);
 
     boolean existsByUserAndChat(UserEntity user, Chat chat);

@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import pl.denys.event.AvatarChatUploadEvent;
 import pl.denys.event.AvatarUploadEvent;
 import pl.denys.model.UserEntity;
+import pl.denys.model.avatar.Avatar;
 import pl.denys.model.chat.Chat;
 import pl.denys.repository.avatar.AvatarRepository;
 import pl.denys.service.chat.ChatService;
@@ -25,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.Clock;
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -64,9 +66,25 @@ public class AvatarService {
         var userId = AuthenticationContextHolderHelper.getAuthentication().getName();
         var user = new UserEntity(userId, null, null);
         log.info("Getting avatar by userId {}", userId);
-        var avatar = repository.findByUser(user);
+        var avatar = repository.findByUserAndIsUsingTrue(user);
         log.info("Avatar has been found successfully for userId {}", avatar);
         var imageFile = new File("./" + avatar.getFileName());
+
+        if (!imageFile.exists()) return ResponseEntity.notFound().build();
+
+        byte[] byteArray = new byte[(int) imageFile.length()];
+        try (var imageOutputStream = new FileImageOutputStream(imageFile)) {
+            imageOutputStream.read(byteArray);
+            return ResponseEntity.ok(byteArray);
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
+    public ResponseEntity getAvatarImageByFilename(String filename) {
+        log.debug("Getting avatar image by filename {}", filename);
+        var imageFile = new File("./" + filename);
 
         if (!imageFile.exists()) return ResponseEntity.notFound().build();
 
@@ -133,6 +151,14 @@ public class AvatarService {
         var outputImage = new BufferedImage(256, 256, BufferedImage.TYPE_INT_RGB);
         outputImage.getGraphics().drawImage(resultingImage, 0, 0, null);
         return outputImage;
+    }
+
+    public List<Avatar> findPrivateChatAvatarsByUserIdAndPrivateChatId(String userId, List<Long> chatIds) {
+        return repository.findAllPrivateChatAvatarsByUserIdAndPrivateChatId(userId, chatIds);
+    }
+
+    public List<Avatar> findPublicChatAvatarsWhereUserIdIsMember(String userId){
+        return repository.findAllPublicChatAvatarsWhereUserIdIsMember(userId);
     }
 
 //    public String getPrivateChatAvatarImage(String userId, Long chatId) {

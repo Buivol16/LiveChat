@@ -34,4 +34,6 @@ public class Avatar {
     @ManyToOne
     @JoinColumn(name = "chat_id")
     private Chat chat;
+    @Column(name = "is_using", nullable = false)
+    private boolean isUsing;
 }

@@ -13,6 +13,7 @@ import pl.denys.event.ChatCreatedEvent;
 import pl.denys.event.UserJoinEvent;
 import pl.denys.mapper.ChatMapper;
 import pl.denys.model.UserEntity;
+import pl.denys.model.avatar.Avatar;
 import pl.denys.model.chat.Chat;
 import pl.denys.model.chat.PrivateChat;
 import pl.denys.model.invitelink.InviteLink;
@@ -75,16 +76,24 @@ public class ChatService {
 
     public List<PrivateChatDTO> getAllPrivateByCreatorIdOrPartnerId() {
         var userId = AuthenticationContextHolderHelper.getAuthentication().getName();
+        log.debug("Getting all private chats with correlation id: {}", userId);
         var privateChats = privateChatRepository.findAllByCreatorIdOrPartnerId(new UserEntity(userId, null, null));
-        var avatars = avatarRepository.findImageFilenameByRequesterUserIdAndChatId(userId, privateChats.stream().map(PrivateChat::getId).toList());
+        log.debug("Private chats found: {}", privateChats);
+        var chatIds = privateChats.stream().map(PrivateChat::getId).toList();
+        log.debug("Trying to find image filenames by requestUserId: {} and chatId: {}", userId, chatIds);
+        var avatars = avatarRepository.findAllPrivateChatAvatarsByUserIdAndPrivateChatId(userId, chatIds);
+        log.debug("Avatars found: {}", avatars);
         privateChats.forEach(privateChat -> privateChat.setCustomerId(userId));
+        log.debug("Set customer id for each avatar: {}", privateChats);
         var privateChatDTOS = mapper.privateChatToPrivateChatDTOList(privateChats);
         if (!avatars.isEmpty()){
             for (int i = 0; i < avatars.size(); i++) {
                 var avatar = avatars.get(i);
                 for (var privateChatDTO : privateChatDTOS) {
+                    log.debug("Getting current private chat {} with this avatar: {}", privateChatDTO, avatar);
                     if (privateChatDTO.getReceiverId().equals(avatar.getUser().getId())) {
                         privateChatDTO.setImgSrc(avatar.getFileName());
+                        log.debug("Set avatar: {}", privateChatDTO);
                         break;
                     }
                 }
@@ -98,7 +107,12 @@ public class ChatService {
         var user = new UserEntity();
         user.setId(userId);
         var publicChats = memberRepository.findAllByUser(user);
-        return publicChats.stream().map(Member::getChat).toList();
+        var avatars = avatarRepository.findAllPublicChatAvatarsWhereUserIdIsMember(userId);
+        var chats = publicChats.stream().map(Member::getChat).toList();
+
+        mapAvatarsToChats(avatars, chats);
+
+        return chats;
     }
 
     public void enterChat(String code) {
@@ -175,5 +189,31 @@ public class ChatService {
 
     public boolean isUserIdAuthorizedToAssignChatAvatar(String userId, Long chatId) {
         return repository.existsByCreatorAndId(userId, chatId);
+    }
+
+    private static void mapAvatarsToChats(List<Avatar> avatars, List<Chat> chats) {
+        if (avatars.size() == chats.size()){
+            for (int i = 0; i < chats.size(); i++) {
+                var chat = chats.get(i);
+                var chatId = chat.getId();
+                var avatar = avatars.get(i);
+                var avatarChatId = avatar.getChat().getId();
+                if (chatId.equals(avatarChatId)){
+                    chat.setImageFilename(avatar.getFileName());
+                }
+            }
+        }else {
+            for (Avatar avatar : avatars) {
+                for (Chat chat : chats) {
+                    var chatId = chat.getId();
+                    var avatarChatId = avatar.getChat().getId();
+                    if (chatId.equals(avatarChatId)) {
+                        chat.setImageFilename(avatar.getFileName());
+                    }
+                }
+            }
+        }
+
+
     }
 }
